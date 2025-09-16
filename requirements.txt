@@ -1,0 +1,6 @@
+fastmcp>=2.8.1
+python-docx
+msoffcrypto-tool
+docx2pdf
+python-dotenv
+uvicorn
