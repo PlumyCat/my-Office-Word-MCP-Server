@@ -17,8 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application source
 COPY word_document_server/ ./word_document_server/
 COPY word_mcp_server.py .
-COPY office_word_mcp_server/ ./office_word_mcp_server/
-COPY __init__.py .
+COPY word_mcp_server_light.py .
 COPY pyproject.toml .
 COPY LICENSE .
 COPY README.md .
@@ -38,5 +37,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/mcp')" || exit 1
 
-# Run the MCP server in HTTP mode
+# Run the full MCP server with all tools including advanced replacement
 CMD ["python", "word_mcp_server.py"]

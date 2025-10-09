@@ -40,3 +40,9 @@ from word_document_server.tools.footnote_tools import (
 from word_document_server.tools.comment_tools import (
     get_all_comments, get_comments_by_author, get_comments_for_paragraph
 )
+
+# Template tools
+from word_document_server.tools.template_tools import (
+    list_document_templates, add_document_template, create_document_from_template,
+    get_template_info, delete_document_template
+)

@@ -3,64 +3,95 @@ Document creation and manipulation tools for Word Document Server.
 """
 import os
 import json
+import io
 from typing import Dict, List, Optional, Any
 from docx import Document
 
 from word_document_server.utils.file_utils import check_file_writeable, ensure_docx_extension, create_document_copy
 from word_document_server.utils.document_utils import get_document_properties, extract_document_text, get_document_structure, get_document_xml, insert_header_near_text, insert_line_or_paragraph_near_text
 from word_document_server.core.styles import ensure_heading_style, ensure_table_style
+from word_document_server.utils.azure_storage import save_document_to_storage, get_document_from_storage, get_document_url
 
 
 async def create_document(filename: str, title: Optional[str] = None, author: Optional[str] = None) -> str:
     """Create a new Word document with optional metadata.
-    
+
     Args:
         filename: Name of the document to create (with or without .docx extension)
         title: Optional title for the document metadata
         author: Optional author for the document metadata
     """
     filename = ensure_docx_extension(filename)
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot create document: {error_message}"
-    
+
     try:
         doc = Document()
-        
+
         # Set properties if provided
         if title:
             doc.core_properties.title = title
         if author:
             doc.core_properties.author = author
-        
+
         # Ensure necessary styles exist
         ensure_heading_style(doc)
         ensure_table_style(doc)
-        
-        # Save the document
-        doc.save(filename)
-        
-        return f"Document {filename} created successfully"
+
+        # Save to memory buffer first
+        doc_buffer = io.BytesIO()
+        doc.save(doc_buffer)
+        doc_data = doc_buffer.getvalue()
+        doc_buffer.close()
+
+        # Save to Azure Blob Storage (or local as fallback)
+        success, message = save_document_to_storage(filename, doc_data)
+
+        if success:
+            # Try to get the public URL if available
+            url = get_document_url(filename)
+            if url:
+                return f"Document {filename} created successfully. Access URL: {url}"
+            else:
+                return f"Document {filename} created successfully. {message}"
+        else:
+            return f"Failed to save document: {message}"
+
     except Exception as e:
         return f"Failed to create document: {str(e)}"
 
 
 async def get_document_info(filename: str) -> str:
     """Get information about a Word document.
-    
+
     Args:
         filename: Path to the Word document
     """
     filename = ensure_docx_extension(filename)
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
+
     try:
-        properties = get_document_properties(filename)
-        return json.dumps(properties, indent=2)
+        # Try to get from storage first
+        success, doc_data, message = get_document_from_storage(filename)
+
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Create temporary file to analyze
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+            temp_file.write(doc_data)
+            temp_path = temp_file.name
+
+        try:
+            properties = get_document_properties(temp_path)
+
+            # Add URL if available
+            url = get_document_url(filename)
+            if url:
+                properties['download_url'] = url
+
+            return json.dumps(properties, indent=2)
+        finally:
+            os.unlink(temp_path)
+
     except Exception as e:
         return f"Failed to get document info: {str(e)}"
 
@@ -89,26 +120,32 @@ async def get_document_outline(filename: str) -> str:
 
 
 async def list_available_documents(directory: str = ".") -> str:
-    """List all .docx files in the specified directory.
-    
+    """List all .docx files in storage.
+
     Args:
-        directory: Directory to search for Word documents
+        directory: Directory to search for Word documents (ignored for Azure storage)
     """
     try:
-        if not os.path.exists(directory):
-            return f"Directory {directory} does not exist"
-        
-        docx_files = [f for f in os.listdir(directory) if f.endswith('.docx')]
-        
-        if not docx_files:
-            return f"No Word documents found in {directory}"
-        
-        result = f"Found {len(docx_files)} Word documents in {directory}:\n"
-        for file in docx_files:
-            file_path = os.path.join(directory, file)
-            size = os.path.getsize(file_path) / 1024  # KB
-            result += f"- {file} ({size:.2f} KB)\n"
-        
+        from word_document_server.utils.azure_storage import list_stored_documents
+
+        success, file_list, message = list_stored_documents()
+
+        if not success:
+            return f"Failed to list documents: {message}"
+
+        if not file_list:
+            return "No Word documents found in storage"
+
+        result = f"Found {len(file_list)} Word documents in storage:\n"
+        for file_info in file_list:
+            status = " (EXPIRED)" if file_info.get('expired', False) else ""
+            size_kb = file_info.get('size', 0) / 1024
+            url = get_document_url(file_info['name'])
+            url_info = f"\n  URL: {url}" if url else ""
+            result += f"- {file_info['name']} ({size_kb:.2f} KB){status}\n"
+            result += f"  Created: {file_info.get('created', 'Unknown')}\n"
+            result += f"  Expires: {file_info.get('expires', 'No expiry')}{url_info}\n"
+
         return result
     except Exception as e:
         return f"Failed to list documents: {str(e)}"
@@ -212,3 +249,70 @@ async def merge_documents(target_filename: str, source_filenames: List[str], add
 async def get_document_xml_tool(filename: str) -> str:
     """Get the raw XML structure of a Word document."""
     return get_document_xml(filename)
+
+
+async def cleanup_expired_documents() -> str:
+    """Clean up expired documents from storage."""
+    try:
+        from word_document_server.utils.azure_storage import cleanup_expired_documents
+
+        success, count, message = cleanup_expired_documents()
+
+        if success:
+            return f"Cleanup completed: {message}"
+        else:
+            return f"Cleanup failed: {message}"
+
+    except Exception as e:
+        return f"Failed to cleanup documents: {str(e)}"
+
+
+async def download_document(filename: str) -> str:
+    """Get download URL for a document."""
+    filename = ensure_docx_extension(filename)
+
+    try:
+        url = get_document_url(filename)
+        if url:
+            return f"Download URL for {filename}: {url}"
+        else:
+            return f"Document {filename} is not available for download or Azure Blob Storage is not configured"
+
+    except Exception as e:
+        return f"Failed to get download URL: {str(e)}"
+
+
+async def debug_storage() -> str:
+    """Debug storage configuration and available documents."""
+    try:
+        from word_document_server.utils.azure_storage import debug_storage_state
+        return debug_storage_state()
+    except Exception as e:
+        return f"Failed to debug storage: {str(e)}"
+
+
+async def check_document_exists(filename: str) -> str:
+    """Check if a document exists in storage and provide detailed diagnostics."""
+    filename = ensure_docx_extension(filename)
+
+    try:
+        # Try to get the document
+        success, doc_data, message = get_document_from_storage(filename)
+
+        result = []
+        result.append(f"Document check for: {filename}")
+        result.append(f"Found: {'Yes' if success else 'No'}")
+        result.append(f"Message: {message}")
+
+        if success and doc_data:
+            result.append(f"Size: {len(doc_data)} bytes")
+
+        # Also show available documents for comparison
+        result.append("\n--- Available Documents ---")
+        available_docs = await list_available_documents()
+        result.append(available_docs)
+
+        return "\n".join(result)
+
+    except Exception as e:
+        return f"Failed to check document existence: {str(e)}"

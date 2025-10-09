@@ -5,6 +5,8 @@ These tools add various types of content to Word documents,
 including headings, paragraphs, tables, images, and page breaks.
 """
 import os
+import io
+import tempfile
 from typing import List, Optional, Dict, Any
 from docx import Document
 from docx.shared import Inches, Pt
@@ -12,48 +14,45 @@ from docx.shared import Inches, Pt
 from word_document_server.utils.file_utils import check_file_writeable, ensure_docx_extension
 from word_document_server.utils.document_utils import find_and_replace_text, insert_header_near_text, insert_numbered_list_near_text, insert_line_or_paragraph_near_text, replace_paragraph_block_below_header, replace_block_between_manual_anchors
 from word_document_server.core.styles import ensure_heading_style, ensure_table_style
+from word_document_server.utils.azure_storage import get_document_from_storage, save_document_to_storage, get_document_url
+from word_document_server.utils.blob_document import load_document_from_blob, save_document_to_blob
 
 
 async def add_heading(filename: str, text: str, level: int = 1) -> str:
     """Add a heading to a Word document.
-    
+
     Args:
         filename: Path to the Word document
         text: Heading text
         level: Heading level (1-9, where 1 is the highest level)
     """
     filename = ensure_docx_extension(filename)
-    
+
     # Ensure level is converted to integer
     try:
         level = int(level)
     except (ValueError, TypeError):
         return "Invalid parameter: level must be an integer between 1 and 9"
-    
+
     # Validate level range
     if level < 1 or level > 9:
         return f"Invalid heading level: {level}. Level must be between 1 and 9."
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        # Suggest creating a copy
-        return f"Cannot modify document: {error_message}. Consider creating a copy first or creating a new document."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Ensure heading styles exist
         ensure_heading_style(doc)
-        
+
         # Try to add heading with style
         try:
             heading = doc.add_heading(text, level=level)
-            doc.save(filename)
-            return f"Heading '{text}' (level {level}) added to {filename}"
         except Exception as style_error:
             # If style-based approach fails, use direct formatting
             paragraph = doc.add_paragraph(text)
@@ -67,54 +66,79 @@ async def add_heading(filename: str, text: str, level: int = 1) -> str:
                 run.font.size = Pt(14)
             else:
                 run.font.size = Pt(12)
-            
-            doc.save(filename)
-            return f"Heading '{text}' added to {filename} with direct formatting (style not available)"
+
+        # Save document back to blob storage
+        doc_buffer = io.BytesIO()
+        doc.save(doc_buffer)
+        doc_data = doc_buffer.getvalue()
+        doc_buffer.close()
+
+        success, save_message = save_document_to_storage(filename, doc_data)
+        if not success:
+            return f"Failed to save document: {save_message}"
+
+        # Get URL if available
+        url = get_document_url(filename)
+        if url:
+            return f"Heading '{text}' (level {level}) added to {filename}. URL: {url}"
+        else:
+            return f"Heading '{text}' (level {level}) added to {filename}"
+
     except Exception as e:
         return f"Failed to add heading: {str(e)}"
 
 
 async def add_paragraph(filename: str, text: str, style: Optional[str] = None) -> str:
     """Add a paragraph to a Word document.
-    
+
     Args:
         filename: Path to the Word document
         text: Paragraph text
         style: Optional paragraph style name
     """
     filename = ensure_docx_extension(filename)
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        # Suggest creating a copy
-        return f"Cannot modify document: {error_message}. Consider creating a copy first or creating a new document."
-    
+
     try:
-        doc = Document(filename)
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
         paragraph = doc.add_paragraph(text)
-        
+
         if style:
             try:
                 paragraph.style = style
             except KeyError:
                 # Style doesn't exist, use normal and report it
                 paragraph.style = doc.styles['Normal']
-                doc.save(filename)
-                return f"Style '{style}' not found, paragraph added with default style to {filename}"
-        
-        doc.save(filename)
-        return f"Paragraph added to {filename}"
+
+        # Save document back to blob storage
+        doc_buffer = io.BytesIO()
+        doc.save(doc_buffer)
+        doc_data = doc_buffer.getvalue()
+        doc_buffer.close()
+
+        success, save_message = save_document_to_storage(filename, doc_data)
+        if not success:
+            return f"Failed to save document: {save_message}"
+
+        # Get URL if available
+        url = get_document_url(filename)
+        if url:
+            return f"Paragraph added to {filename}. URL: {url}"
+        else:
+            return f"Paragraph added to {filename}"
+
     except Exception as e:
         return f"Failed to add paragraph: {str(e)}"
 
 
 async def add_table(filename: str, rows: int, cols: int, data: Optional[List[List[str]]] = None) -> str:
     """Add a table to a Word document.
-    
+
     Args:
         filename: Path to the Word document
         rows: Number of rows in the table
@@ -122,18 +146,12 @@ async def add_table(filename: str, rows: int, cols: int, data: Optional[List[Lis
         data: Optional 2D array of data to fill the table
     """
     filename = ensure_docx_extension(filename)
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        # Suggest creating a copy
-        return f"Cannot modify document: {error_message}. Consider creating a copy first or creating a new document."
-    
+
     try:
-        doc = Document(filename)
+        # Load document from blob storage
+        success, doc, message = load_document_from_blob(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
         table = doc.add_table(rows=rows, cols=cols)
         
         # Try to set the table style
@@ -153,8 +171,13 @@ async def add_table(filename: str, rows: int, cols: int, data: Optional[List[Lis
                         break
                     table.cell(i, j).text = str(cell_text)
         
-        doc.save(filename)
-        return f"Table ({rows}x{cols}) added to {filename}"
+        # Save document back to blob storage
+        success, message = save_document_to_blob(filename, doc)
+        if success:
+            return f"Table ({rows}x{cols}) added to {filename}. {message}"
+        else:
+            return f"Failed to save document: {message}"
+
     except Exception as e:
         return f"Failed to add table: {str(e)}"
 
@@ -370,31 +393,43 @@ async def delete_paragraph(filename: str, paragraph_index: int) -> str:
 
 async def search_and_replace(filename: str, find_text: str, replace_text: str) -> str:
     """Search for text and replace all occurrences.
-    
+
     Args:
         filename: Path to the Word document
         find_text: Text to search for
         replace_text: Text to replace with
     """
     filename = ensure_docx_extension(filename)
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot modify document: {error_message}. Consider creating a copy first."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Perform find and replace
         count = find_and_replace_text(doc, find_text, replace_text)
-        
+
         if count > 0:
-            doc.save(filename)
-            return f"Replaced {count} occurrence(s) of '{find_text}' with '{replace_text}'."
+            # Save document back to blob storage
+            doc_buffer = io.BytesIO()
+            doc.save(doc_buffer)
+            doc_data = doc_buffer.getvalue()
+            doc_buffer.close()
+
+            success, save_message = save_document_to_storage(filename, doc_data)
+            if not success:
+                return f"Failed to save document: {save_message}"
+
+            # Get URL if available
+            url = get_document_url(filename)
+            if url:
+                return f"Replaced {count} occurrence(s) of '{find_text}' with '{replace_text}'. URL: {url}"
+            else:
+                return f"Replaced {count} occurrence(s) of '{find_text}' with '{replace_text}'."
         else:
             return f"No occurrences of '{find_text}' found."
     except Exception as e:

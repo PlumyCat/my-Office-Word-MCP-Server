@@ -1,182 +1,209 @@
-Transformer **Office-Word-MCP-Server** en **serveur HTTP (Streamable)** déployable sur **Azure Container Apps** – donc “URL-ready” pour Copilot Studio.
+# TODO - Office Word MCP Server
 
-> Référence utile : FastMCP sait lancer un serveur **Streamable HTTP** sans FastAPI externe :
-> `mcp.run(transport="http", host="0.0.0.0", port=8000, path="/mcp")`. ([GitHub][[1](https://github.com/jlowin/fastmcp?utm_source=chatgpt.com)])
+## 📋 Vue d'ensemble du projet
 
----
+Implémentation d'un serveur MCP pour la manipulation de documents Word avec stockage Azure Blob Storage et système de templates.
 
-# 🎯 Objectif
+## ✅ Fonctionnalités complétées
 
-* Passer le serveur de **STDIO** → **HTTP streamable** (endpoint `/mcp`).
-* Dockeriser proprement (port **8000**).
-* Déployer sur **Azure Container Apps**.
-* Ajouter **API Key**.
+- [x] Serveur MCP de base avec FastMCP
+- [x] Outils de manipulation Word (création, édition, formatage)
+- [x] Intégration Azure Blob Storage pour persistance
+- [x] Support multi-transport (stdio, HTTP, SSE)
+- [x] Scripts de déploiement Azure Container Apps
+- [x] Gestion TTL des documents
+- [x] URLs publiques temporaires pour accès aux documents
 
----
+## 🚀 Prochaines étapes prioritaires
 
-# ✅ “Claude Code Workplan” (copie-colle tel quel)
+### 1. 📄 Système de Templates
 
-**Context:** The repo is `GongRzhe/Office-Word-MCP-Server`. We need to turn it into an HTTP (Streamable) MCP server for ACA.
+#### Architecture
+- [ ] Créer un container blob dédié pour les templates (`word-templates`)
+- [ ] Structure de stockage : `/templates/{category}/{template_name}.docx`
+- [ ] Métadonnées des templates en tags blob (description, auteur, date)
 
-## 1) Add/ensure dependencies
+#### Nouveaux Tools MCP
 
-* Open `requirements.txt`.
-* **Ensure** these packages exist (add if missing):
-
-  ```
-  mcp
-  fastmcp
-  ```
-* Keep existing Word libs (e.g., `python-docx`) untouched.
-* Save.
-
-(Sources: FastMCP “Streamable HTTP” run support.) ([GitHub][1])
-
-## 2) Switch the server to HTTP streamable
-
-* Open `word_mcp_server.py`.
-* Find where the MCP server is instantiated (likely `from mcp.server.fastmcp import FastMCP` or `from fastmcp import FastMCP`) and where it’s run (often `mcp.run()` with default STDIO).
-* **Change the run call** to HTTP streamable, listening on `0.0.0.0:8000` with path `/mcp`:
-
+##### Tool 1: `list_templates`
+- [ ] Lister tous les templates disponibles
+- [ ] Filtrage par catégorie
+- [ ] Retour : nom, description, catégorie, URL preview
 ```python
-if __name__ == "__main__":
-    # previous: mcp.run() or mcp.run(transport="stdio")
-    mcp.run(
-        transport="http",
-        host="0.0.0.0",
-        port=8000,
-        path="/mcp",
-    )
+async def list_templates(category: Optional[str] = None) -> str:
+    # Implémenter la liste depuis Azure Blob Storage
+    pass
 ```
 
-* If the file uses the **old import** `from mcp.server.fastmcp import FastMCP`, keep it; otherwise `from fastmcp import FastMCP` also works (both support HTTP run – prefer whichever the repo already uses).
-* Do **not** remove tool registrations; only modify the **runner** line.
-* Save.
-
-(Refs: fastmcp README + docs “Running server → Streamable HTTP”.) ([GitHub][1])
-
-## 3) Add a health endpoint (simple)
-
-FastMCP’s built-in HTTP transport exposes `/mcp`. For ACA readiness, add a tiny health route:
-
-* Create a new file `health_http.py`:
-
+##### Tool 2: `add_template`
+- [ ] Upload d'un document existant comme template
+- [ ] Définition de la catégorie et métadonnées
+- [ ] Validation du format .docx
 ```python
-# Minimal ASGI app for /health (served by uvicorn separately if needed)
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+async def add_template(
+    source_document: str,
+    template_name: str,
+    category: str,
+    description: str
+) -> str:
+    # Implémenter l'ajout de template
+    pass
 ```
 
-**Two ways to serve health:**
-
-* **Simpler (one process):** skip this file for now; ACA can probe `/mcp` with a GET (it will 405). Often acceptable.
-* **Safer:** run a second small uvicorn just for `/health`. If you want the safer way, add FastAPI to `requirements.txt` and run a tiny sidecar process.
-  👉 Pour réduire la complexité, **tu peux ignorer `/health`** au début.
-
-## 4) Dockerize (port 8000)
-
-* Open `Dockerfile` (exists in repo). Replace content with:
-
-```dockerfile
-FROM python:3.12-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy source
-COPY . .
-
-# Expose HTTP (Streamable) at :8000 (/mcp path)
-ENV PORT=8000
-EXPOSE 8000
-
-# Run the MCP server in HTTP mode directly via the main file
-# (Assumes you edited word_mcp_server.py runner to transport="http")
-CMD ["python", "word_mcp_server.py"]
+##### Tool 3: `create_from_template`
+- [ ] Créer un nouveau document depuis un template
+- [ ] Copie du template vers le stockage documents
+- [ ] Préservation du formatage et styles
+```python
+async def create_from_template(
+    template_name: str,
+    new_document_name: str,
+    variables: Optional[Dict[str, str]] = None
+) -> str:
+    # Implémenter la création depuis template
+    pass
 ```
 
-* Save.
+#### Fichiers à modifier
+- [ ] `word_document_server/tools/template_tools.py` (nouveau)
+- [ ] `word_document_server/utils/template_storage.py` (nouveau)
+- [ ] `word_document_server/main.py` (enregistrer les nouveaux tools)
 
-## 5) Build & push image to ACR
+### 2. 🐳 Déploiement Docker
 
-Use your ACR name:
+#### Configuration Docker
+- [ ] Mettre à jour `Dockerfile` pour la production
+  ```dockerfile
+  FROM python:3.11-slim
+  WORKDIR /app
+  COPY requirements.txt .
+  RUN pip install --no-cache-dir -r requirements.txt
+  COPY . .
+  EXPOSE 8000
+  CMD ["python", "word_mcp_server.py"]
+  ```
 
-```bash
-az acr build -t word-mcp:latest -r <ACR_NAME> .
-```
+- [ ] Créer `docker-compose.yml` pour tests locaux
+  ```yaml
+  version: '3.8'
+  services:
+    word-mcp-server:
+      build: .
+      ports:
+        - "8000:8000"
+      environment:
+        - MCP_TRANSPORT=http
+        - MCP_HOST=0.0.0.0
+        - MCP_PORT=8000
+        - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+  ```
 
-## 6) Deploy to Azure Container Apps
+- [ ] Script de build et push : `build-docker.sh`
+- [ ] Test local avec Docker avant push Azure
 
-If the managed environment exists (`<ENV_NAME>`), deploy:
+### 3. 🧪 Tests avec MCP Inspector et Playwright
 
-```bash
-az containerapp create \
-  --name word-mcp \
-  --resource-group <RG_NAME> \
-  --environment <ENV_NAME> \
-  --image <ACR_NAME>.azurecr.io/word-mcp:latest \
-  --ingress external --target-port 8000 \
-  --min-replicas 0 --max-replicas 1 \
-  --query properties.configuration.ingress.fqdn -o tsv
-```
+#### MCP Inspector
+- [ ] Mettre à jour `run-mcp-inspector.sh` pour tester les nouveaux tools
+- [ ] Scénarios de test :
+  - [ ] Lister les templates disponibles
+  - [ ] Ajouter un nouveau template
+  - [ ] Créer un document depuis un template
+  - [ ] Vérifier la persistance dans Azure Blob
 
-This prints your public FQDN like `word-mcp.<region>.azurecontainerapps.io`.
+#### Tests Playwright automatisés
+- [ ] Créer `test_templates.py` avec tests E2E
+  ```python
+  async def test_template_workflow():
+      # 1. Navigate vers MCP Inspector
+      # 2. Connect au serveur
+      # 3. Test list_templates
+      # 4. Test add_template
+      # 5. Test create_from_template
+      # 6. Vérifier le document créé
+  ```
 
-> Notes ACA:
->
-> * `--min-replicas 0` → **scale-to-zero** (coûts \~0 quand idle).
-> * SSE/stream ok on ACA.
->   (Docs: ACA + free/scale-to-zero tiers.) ([GitHub][2])
+- [ ] Script de lancement : `test-templates-e2e.sh`
+- [ ] CI/CD avec GitHub Actions
 
-## 7) Test quickly (local and remote)
+### 4. 📦 Intégration complète
 
-* Local (optional): `docker run -p 8000:8000 word-mcp:latest`
-* Remote: `curl -i https://<FQDN>/mcp` (should not 404; may 405 on GET, which is fine).
+#### Tests d'intégration
+- [ ] Test complet avec Azure Blob Storage
+- [ ] Test de performance avec templates volumineux
+- [ ] Test de concurrence (multiple users)
+- [ ] Test de résilience (perte connexion, retry)
 
-## 8) Plug into Copilot Studio
+#### Documentation
+- [ ] README mise à jour avec exemples templates
+- [ ] Guide d'utilisation des templates
+- [ ] API documentation pour les nouveaux tools
+- [ ] Exemples de templates par défaut
 
-In your agent → **Tools → Add → Model Context Protocol**:
+## 🎯 Milestones
 
-* **Server URL**: `https://<FQDN>/mcp`
-* **Auth**: None (for the very first test).
-  If you later want **API key**, we’ll add a tiny header check middleware, but start simple.
+### Milestone 1 - Templates Core (Sprint 1)
+- [ ] Architecture templates définie
+- [ ] Storage layer implémenté
+- [ ] 3 tools créés et fonctionnels
+- **Deadline estimée : 3 jours**
 
-(How to connect existing MCP by URL per MS docs.) ([GitHub][3])
+### Milestone 2 - Docker & Deployment (Sprint 2)
+- [ ] Dockerfile optimisé
+- [ ] Docker compose pour dev local
+- [ ] Déploiement Azure Container Apps
+- **Deadline estimée : 2 jours**
 
----
+### Milestone 3 - Testing & QA (Sprint 3)
+- [ ] Tests MCP Inspector complets
+- [ ] Tests Playwright E2E
+- [ ] Documentation complète
+- **Deadline estimée : 2 jours**
 
-## 🔐 (Optionnel) API Key minimale
+## 🐛 Bugs connus
 
-Si tu veux protéger l’URL :
+- [ ] Gestion des erreurs lors de timeout Azure
+- [ ] Validation des formats de fichiers
+- [ ] Cleanup des documents expirés (amélioration nécessaire)
 
-1. Ajoute une variable d’env `MCP_API_KEY` dans ACA:
+## 💡 Idées futures
 
-```
---secrets mcp-api-key=<YOUR_SECRET> \
---env-vars MCP_API_KEY=secretref:mcp-api-key
-```
+- [ ] Support de variables dans les templates ({{name}}, {{date}})
+- [ ] Versioning des templates
+- [ ] Templates partagés vs privés
+- [ ] Preview des templates (générer image/PDF)
+- [ ] Import/Export en masse de templates
+- [ ] Intégration avec Microsoft Graph API
+- [ ] Cache local pour performance
+- [ ] Support multi-langues pour templates
 
-2. Au lieu d’utiliser le runner “tout-en-un”, bascule vers **FastAPI wrapper** plus tard (pour vérifier `Authorization: Bearer <key>`).
-   Pour la première passe, **laisse sans auth** (réduit la complexité). On fera l’auth quand l’URL marche.
+## 📝 Notes de développement
 
----
+### Priorités
+1. **URGENT** : Implémenter les 3 tools de templates
+2. **IMPORTANT** : Dockerisation pour déploiement facile
+3. **NICE TO HAVE** : Tests automatisés complets
 
-## 📎 Remarques spécifiques au repo
+### Dépendances à surveiller
+- FastMCP version : vérifier compatibilité
+- python-docx : limitations avec templates complexes
+- Azure SDK : mise à jour régulière nécessaire
 
-* Le README du repo montre l’usage **Claude Desktop** (STDIO). On ne casse rien : on ne modifie que **la ligne `mcp.run(...)`** pour HTTP. Le reste (tools Word) est inchangé. ([GitHub][3])
-* Si l’import est `from mcp.server.fastmcp import FastMCP`, garde-le (FastMCP v1). Si c’est v2 : `from fastmcp import FastMCP`. Les deux ont `run(transport="http", ...)`. ([GitHub][1])
+### Points de vigilance
+- Sécurité : validation stricte des uploads de templates
+- Performance : cache pour templates fréquemment utilisés
+- Coûts Azure : optimiser les requêtes blob storage
 
----
+## 🔗 Ressources
 
-## 🧪 Check-list “ça marche”
+- [FastMCP Documentation](https://github.com/jlowin/fastmcp)
+- [Azure Blob Storage SDK](https://docs.microsoft.com/azure/storage/blobs/)
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
+- [Playwright Python](https://playwright.dev/python/)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
 
-* `GET https://<FQDN>/mcp` → 405 (OK)
-* **Copilot Studio → Test connection** passe ✅
-* Un prompt simple côté agent qui appelle un tool Word (création doc) renvoie un résultat.
+## 📊 Progression globale
 
+![Progress](https://progress-bar.dev/40/?title=Completion)
+
+**Statut actuel : 40% - Core fonctionnel, templates en développement**

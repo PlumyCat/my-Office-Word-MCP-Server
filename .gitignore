@@ -8,3 +8,45 @@ wheels/
 
 # Virtual environments
 .venv
+venv/
+env/
+
+# Test files and temporary documents
+test-*.py
+test-*.sh
+test-*.md
+test_*.docx
+*.docx
+debug_*.py
+explore-*.py
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env copy
+.env.local
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.bak
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp

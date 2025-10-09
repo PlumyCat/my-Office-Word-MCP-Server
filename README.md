@@ -142,6 +142,162 @@ Alternatively, you can use the provided setup script which handles:
 python setup_mcp.py
 ```
 
+## Azure Container Apps Deployment
+
+This server can be deployed to Azure Container Apps for cloud-based access and integration with Microsoft Copilot Studio.
+
+### Prerequisites
+
+- Azure CLI installed and configured
+- An Azure subscription
+- Azure Container Registry (ACR)
+- Azure Container Apps Environment
+
+### Quick Deployment with Azure Blob Storage
+
+The recommended deployment method includes Azure Blob Storage for document management:
+
+```bash
+./deploy-azure-with-storage.sh <ACR_NAME> <RESOURCE_GROUP> <ENVIRONMENT_NAME> [API_KEY] [TTL_HOURS]
+```
+
+**Example with API key (RECOMMENDED for production):**
+```bash
+./deploy-azure-with-storage.sh mywordmcpacr my-word-mcp-rg my-word-mcp-env "your-secure-api-key-here" 48
+```
+
+**Example without API key (NOT recommended for production):**
+```bash
+./deploy-azure-with-storage.sh mywordmcpacr my-word-mcp-rg my-word-mcp-env
+```
+
+⚠️ **Security Warning**: Always use an API key for production deployments to prevent unauthorized access.
+
+This script automatically:
+- Builds and pushes the Docker image to ACR
+- Creates an Azure Storage Account (if it doesn't exist)
+- Creates the blob container for documents
+- Deploys the Container App with all required environment variables:
+  - `AZURE_STORAGE_CONNECTION_STRING`
+  - `AZURE_STORAGE_ACCOUNT_KEY`
+  - `AZURE_STORAGE_ACCOUNT_NAME`
+  - `AZURE_STORAGE_CONTAINER_NAME`
+  - `AZURE_TEMPLATES_CONTAINER_NAME`
+- Configures managed identity with appropriate permissions
+- Sets up document TTL (Time To Live) for automatic cleanup
+
+### Simple Deployment (No Storage)
+
+For basic deployment without Azure Blob Storage:
+
+```bash
+./deploy-azure.sh <ACR_NAME> <RESOURCE_GROUP> <ENVIRONMENT_NAME>
+```
+
+### Updating Existing Deployment
+
+#### Update Only Environment Variables (No Rebuild)
+
+Perfect for changing storage credentials or configuration without rebuilding the image:
+
+```bash
+./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP> --env-only --storage-account <STORAGE_ACCOUNT_NAME>
+```
+
+**Example:**
+```bash
+./update-azure-app.sh mywordmcpacr my-word-mcp-rg --env-only --storage-account mywordmcpacrstorage
+```
+
+This retrieves the latest storage credentials from Azure and updates the Container App without rebuilding the Docker image. The container restarts automatically with the new configuration.
+
+#### Add or Update API Key on Existing Deployment
+
+If you deployed without an API key and want to add one (or change it):
+
+```bash
+az containerapp update \
+  --name word-mcp-server \
+  --resource-group <RESOURCE_GROUP> \
+  --set-env-vars API_KEY="your-secure-api-key-here"
+```
+
+**Example:**
+```bash
+az containerapp update \
+  --name word-mcp-server \
+  --resource-group my-word-mcp-rg \
+  --set-env-vars API_KEY="my-super-secret-key-123"
+```
+
+The container will restart automatically with authentication enabled.
+
+#### Update Image and Environment Variables
+
+To update both the Docker image and environment variables:
+
+```bash
+./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP> --storage-account <STORAGE_ACCOUNT_NAME>
+```
+
+#### Update Image Only
+
+To rebuild and update just the Docker image:
+
+```bash
+./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP>
+```
+
+### Configuration on Azure
+
+All environment variables are configured directly on the Azure Container App - no need to modify `.env` files locally. The deployment scripts automatically retrieve storage credentials from Azure and configure them on the container.
+
+### Security and Authentication
+
+The server supports API key authentication via the `X-API-Key` header for HTTP/SSE transports.
+
+**Authentication Behavior:**
+- ✅ **With API_KEY configured**: All requests require valid `X-API-Key` header
+- ⚠️ **Without API_KEY**: Server runs without authentication (NOT recommended for production)
+- ℹ️ **stdio transport**: No authentication required (local development only)
+
+**Testing with authentication:**
+```bash
+# Without API key (will fail if authentication is enabled)
+curl -X GET "https://<YOUR-APP-URL>/mcp"
+
+# With API key
+curl -X GET "https://<YOUR-APP-URL>/mcp" \
+  -H "X-API-Key: your-secret-key"
+```
+
+### Integration with Copilot Studio
+
+After deployment, configure the MCP server in Microsoft Copilot Studio:
+
+1. Go to your agent → **Tools** → **Add** → **Model Context Protocol**
+2. **Server URL**: `https://<YOUR-APP-URL>/mcp`
+3. **Authentication**:
+   - **Type**: Custom Header
+   - **Header Name**: `X-API-Key`
+   - **Header Value**: Your API key (e.g., `my-super-secret-key-123`)
+
+**Example configuration in Copilot Studio:**
+```json
+{
+  "url": "https://word-mcp-server.azurecontainerapps.io/mcp",
+  "headers": {
+    "X-API-Key": "your-secret-key"
+  }
+}
+```
+
+### Additional Resources
+
+See `AZURE_DEPLOYMENT.md` for complete deployment instructions and troubleshooting.
+
+See `COPILOT_STUDIO_SETUP.md` for Copilot Studio integration guide.
+
 ## Usage with Claude for Desktop
 
 ### Configuration

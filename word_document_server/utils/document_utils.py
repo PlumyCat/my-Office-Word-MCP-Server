@@ -39,23 +39,31 @@ def get_document_properties(doc_path: str) -> Dict[str, Any]:
 
 def extract_document_text(doc_path: str) -> str:
     """Extract all text from a Word document."""
-    import os
-    if not os.path.exists(doc_path):
-        return f"Document {doc_path} does not exist"
-    
+    import io
+    from word_document_server.utils.azure_storage import get_document_from_storage
+    from word_document_server.utils.file_utils import ensure_docx_extension
+
+    filename = ensure_docx_extension(doc_path)
+
+    # Get document from Azure Blob Storage
+    success, doc_data, message = get_document_from_storage(filename)
+    if not success:
+        return f"Document {filename} does not exist: {message}"
+
     try:
-        doc = Document(doc_path)
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
         text = []
-        
+
         for paragraph in doc.paragraphs:
             text.append(paragraph.text)
-            
+
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
                     for paragraph in cell.paragraphs:
                         text.append(paragraph.text)
-        
+
         return "\n".join(text)
     except Exception as e:
         return f"Failed to extract text: {str(e)}"
@@ -63,17 +71,25 @@ def extract_document_text(doc_path: str) -> str:
 
 def get_document_structure(doc_path: str) -> Dict[str, Any]:
     """Get the structure of a Word document."""
-    import os
-    if not os.path.exists(doc_path):
-        return {"error": f"Document {doc_path} does not exist"}
-    
+    import io
+    from word_document_server.utils.azure_storage import get_document_from_storage
+    from word_document_server.utils.file_utils import ensure_docx_extension
+
+    filename = ensure_docx_extension(doc_path)
+
+    # Get document from Azure Blob Storage
+    success, doc_data, message = get_document_from_storage(filename)
+    if not success:
+        return {"error": f"Document {filename} does not exist: {message}"}
+
     try:
-        doc = Document(doc_path)
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
         structure = {
             "paragraphs": [],
             "tables": []
         }
-        
+
         # Get paragraphs
         for i, para in enumerate(doc.paragraphs):
             structure["paragraphs"].append({
@@ -81,7 +97,7 @@ def get_document_structure(doc_path: str) -> Dict[str, Any]:
                 "text": para.text[:100] + ("..." if len(para.text) > 100 else ""),
                 "style": para.style.name if para.style else "Normal"
             })
-        
+
         # Get tables
         for i, table in enumerate(doc.tables):
             table_data = {
@@ -90,7 +106,7 @@ def get_document_structure(doc_path: str) -> Dict[str, Any]:
                 "columns": len(table.columns),
                 "preview": []
             }
-            
+
             # Get sample of table data
             max_rows = min(3, len(table.rows))
             for row_idx in range(max_rows):
@@ -103,9 +119,9 @@ def get_document_structure(doc_path: str) -> Dict[str, Any]:
                     except IndexError:
                         row_data.append("N/A")
                 table_data["preview"].append(row_data)
-            
+
             structure["tables"].append(table_data)
-        
+
         return structure
     except Exception as e:
         return {"error": f"Failed to get document structure: {str(e)}"}

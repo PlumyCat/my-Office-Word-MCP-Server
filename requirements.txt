@@ -4,3 +4,6 @@ msoffcrypto-tool
 docx2pdf
 python-dotenv
 uvicorn
+starlette
+azure-storage-blob
+azure-identity

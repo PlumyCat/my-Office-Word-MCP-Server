@@ -14,6 +14,9 @@ load_dotenv()
 # Set required environment variable for FastMCP 2.8.1+
 os.environ.setdefault('FASTMCP_LOG_LEVEL', 'INFO')
 from fastmcp import FastMCP
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+from starlette.requests import Request
 from word_document_server.tools import (
     document_tools,
     content_tools,
@@ -21,15 +24,62 @@ from word_document_server.tools import (
     protection_tools,
     footnote_tools,
     extended_document_tools,
-    comment_tools
+    comment_tools,
+    template_tools,
+    demo_tools,
+    advanced_replace_tools
 )
 from word_document_server.tools.content_tools import replace_paragraph_block_below_header_tool
 from word_document_server.tools.content_tools import replace_block_between_manual_anchors_tool
 
+class APIKeyMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to validate API key for HTTP/SSE transports.
+    Checks for X-API-Key header and compares with API_KEY environment variable.
+    """
+
+    def __init__(self, app, api_key: str = None):
+        super().__init__(app)
+        self.api_key = api_key
+        self.require_auth = api_key is not None and len(api_key) > 0
+
+    async def dispatch(self, request: Request, call_next):
+        # Skip auth for stdio transport or if no API key is configured
+        if not self.require_auth:
+            return await call_next(request)
+
+        # Skip auth check for health check endpoints
+        if request.url.path in ["/health", "/", "/docs", "/openapi.json"]:
+            return await call_next(request)
+
+        # Check for API key in headers
+        provided_key = request.headers.get("X-API-Key") or request.headers.get("x-api-key")
+
+        if not provided_key:
+            return JSONResponse(
+                status_code=401,
+                content={
+                    "error": "Unauthorized",
+                    "message": "Missing API key. Provide X-API-Key header."
+                }
+            )
+
+        if provided_key != self.api_key:
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "Forbidden",
+                    "message": "Invalid API key."
+                }
+            )
+
+        return await call_next(request)
+
+
 def get_transport_config():
     """
     Get transport configuration from environment variables.
-    
+
     Returns:
         dict: Transport configuration with type, host, port, and other settings
     """
@@ -39,9 +89,10 @@ def get_transport_config():
         'host': '0.0.0.0',
         'port': 8000,
         'path': '/mcp',
-        'sse_path': '/sse'
+        'sse_path': '/sse',
+        'api_key': None
     }
-    
+
     # Override with environment variables if provided
     transport = os.getenv('MCP_TRANSPORT', 'stdio').lower()
     print(f"Transport: {transport}")
@@ -50,13 +101,26 @@ def get_transport_config():
     if transport not in valid_transports:
         print(f"Warning: Invalid transport '{transport}'. Falling back to 'stdio'.")
         transport = 'stdio'
-    
+
+    # For HTTP mode, use streamable-http for better MCP client compatibility
+    if transport == 'http':
+        transport = 'streamable-http'
+        print("Note: Converting 'http' to 'streamable-http' for MCP client compatibility")
+
     config['transport'] = transport
     config['host'] = os.getenv('MCP_HOST', config['host'])
     config['port'] = int(os.getenv('MCP_PORT', config['port']))
     config['path'] = os.getenv('MCP_PATH', config['path'])
     config['sse_path'] = os.getenv('MCP_SSE_PATH', config['sse_path'])
-    
+
+    # Get API key if configured
+    api_key = os.getenv('API_KEY')
+    if api_key:
+        config['api_key'] = api_key
+        print("API Key authentication enabled")
+    else:
+        print("Warning: No API_KEY configured. Server is running WITHOUT authentication!")
+
     return config
 
 
@@ -85,10 +149,13 @@ def setup_logging(debug_mode):
 # Initialize FastMCP server
 mcp = FastMCP("Word Document Server")
 
+# Get API key from environment for middleware
+_API_KEY = os.getenv('API_KEY')
+
 
 def register_tools():
     """Register all tools with the MCP server using FastMCP decorators."""
-    
+
     # Document tools (create, copy, info, etc.)
     @mcp.tool()
     def create_document(filename: str, title: str = None, author: str = None):
@@ -116,14 +183,39 @@ def register_tools():
         return document_tools.get_document_outline(filename)
     
     @mcp.tool()
+    def list_all_documents():
+        """List ALL Word documents in storage. No parameters needed."""
+        return document_tools.list_available_documents(".")
+
+    @mcp.tool()
     def list_available_documents(directory: str = "."):
         """List all .docx files in the specified directory."""
         return document_tools.list_available_documents(directory)
+
+    @mcp.tool()
+    def debug_storage():
+        """Debug storage configuration and show available documents."""
+        return document_tools.debug_storage()
+
+    @mcp.tool()
+    def check_document_exists(filename: str):
+        """Check if a document exists in storage with detailed diagnostics."""
+        return document_tools.check_document_exists(filename)
     
     @mcp.tool()
     def get_document_xml(filename: str):
         """Get the raw XML structure of a Word document."""
         return document_tools.get_document_xml_tool(filename)
+
+    @mcp.tool()
+    def cleanup_expired_documents():
+        """Clean up expired documents from storage (TTL cleanup)."""
+        return document_tools.cleanup_expired_documents()
+
+    @mcp.tool()
+    def download_document(filename: str):
+        """Get download URL for a document."""
+        return document_tools.download_document(filename)
     
     @mcp.tool()
     def insert_header_near_text(filename: str, target_text: str = None, header_title: str = None, position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: int = None):
@@ -423,67 +515,144 @@ def register_tools():
 
     @mcp.tool()
     def set_table_cell_padding(filename: str, table_index: int, row_index: int, col_index: int,
-                               top: float = None, bottom: float = None, left: float = None, 
+                               top: float = None, bottom: float = None, left: float = None,
                                right: float = None, unit: str = "points"):
         """Set padding/margins for a specific table cell."""
         return format_tools.set_table_cell_padding(filename, table_index, row_index, col_index,
                                                    top, bottom, left, right, unit)
 
+    # Template tools
+    @mcp.tool()
+    def list_all_templates():
+        """List ALL available templates. No parameters needed. Shows all templates in all categories."""
+        return template_tools.list_document_templates("")
+
+    @mcp.tool()
+    def list_document_templates(category: str = None):
+        """List all available document templates, optionally filtered by category."""
+        return template_tools.list_document_templates(category)
+
+    @mcp.tool()
+    def add_document_template(source_document: str, template_name: str, category: str = "general",
+                             description: str = "", author: str = "Unknown"):
+        """Add a document as a template to the template library."""
+        return template_tools.add_document_template(source_document, template_name, category, description, author)
+
+    @mcp.tool()
+    def create_document_from_template(template_name: str, new_document_name: str, category: str = "general",
+                                    variables: dict = None):
+        """Create a new document from an existing template with optional variable substitution."""
+        return template_tools.create_document_from_template(template_name, new_document_name, category, variables)
+
+    @mcp.tool()
+    def get_template_info(template_name: str, category: str = "general"):
+        """Get detailed information about a specific template."""
+        return template_tools.get_template_info(template_name, category)
+
+    @mcp.tool()
+    def delete_document_template(template_name: str, category: str = "general"):
+        """Delete a template from the template library."""
+        return template_tools.delete_document_template(template_name, category)
+
+    # Advanced replacement tools
+    @mcp.tool()
+    async def replace_text_universal(filename: str, find_text: str, replace_text: str):
+        """Universal text replacement that works everywhere in the document.
+        Searches and replaces in: paragraphs, tables, headers, and footers."""
+        return await advanced_replace_tools.replace_text_universal(filename, find_text, replace_text)
+
+    @mcp.tool()
+    async def list_content_controls(filename: str):
+        """List all ContentControls (structured fields) in the document.
+        Note: Feature coming soon."""
+        return await advanced_replace_tools.list_content_controls(filename)
 
 
 def run_server():
     """Run the Word Document MCP Server with configurable transport."""
     # Get transport configuration
     config = get_transport_config()
-    
+
     # Setup logging
     # setup_logging(config['debug'])
-    
+
     # Register all tools
     register_tools()
-    
+
     # Print startup information
     transport_type = config['transport']
     print(f"Starting Word Document MCP Server with {transport_type} transport...")
-    
+
     # if config['debug']:
     #     print(f"Configuration: {config}")
-    
+
     try:
         if transport_type == 'stdio':
             # Run with stdio transport (default, backward compatible)
             print("Server running on stdio transport")
             mcp.run(transport='stdio')
-            
+
         elif transport_type == 'streamable-http' or transport_type == 'http':
             # Run with streamable HTTP transport
             print(f"Server running on streamable-http transport at http://{config['host']}:{config['port']}{config['path']}")
+            api_key = config.get('api_key')
+            if api_key:
+                print(f"🔐 Authentication: Required (X-API-Key header)")
+                # Add middleware to the app before running
+                from starlette.applications import Starlette
+                from starlette.middleware import Middleware
+
+                # Create middleware list
+                middleware = [Middleware(APIKeyMiddleware, api_key=api_key)]
+                print("Added API key authentication middleware")
+            else:
+                print(f"⚠️  Authentication: DISABLED")
+                print(f"⚠️  Set API_KEY environment variable to enable authentication")
+                middleware = None
+
             mcp.run(
                 transport='http',
                 host=config['host'],
                 port=config['port'],
-                path=config['path']
+                path=config['path'],
+                middleware=middleware if middleware else []
             )
-            
+
         elif transport_type == 'sse':
             # Run with SSE transport
             print(f"Server running on SSE transport at http://{config['host']}:{config['port']}{config['sse_path']}")
+            api_key = config.get('api_key')
+            if api_key:
+                print(f"🔐 Authentication: Required (X-API-Key header)")
+                # Add middleware to the app before running
+                from starlette.applications import Starlette
+                from starlette.middleware import Middleware
+
+                # Create middleware list
+                middleware = [Middleware(APIKeyMiddleware, api_key=api_key)]
+                print("Added API key authentication middleware")
+            else:
+                print(f"⚠️  Authentication: DISABLED")
+                print(f"⚠️  Set API_KEY environment variable to enable authentication")
+                middleware = None
+
             mcp.run(
                 transport='sse',
                 host=config['host'],
                 port=config['port'],
-                path=config['sse_path']
+                path=config['sse_path'],
+                middleware=middleware if middleware else []
             )
-            
+
     except KeyboardInterrupt:
         print("\nShutting down server...")
     except Exception as e:
         print(f"Error starting server: {e}")
-        if config['debug']:
+        if 'debug' in config and config['debug']:
             import traceback
             traceback.print_exc()
         sys.exit(1)
-    
+
     return mcp
 
 
