@@ -61,13 +61,15 @@ class AzureBlobStorage:
             self._ensure_container_exists()
 
     def _ensure_container_exists(self):
-        """Ensure the blob container exists."""
+        """Ensure the blob container exists - PRIVATE by default for security."""
         try:
             container_client = self.blob_service_client.get_container_client(self.container_name)
             if not container_client.exists():
-                container_client.create_container(public_access='blob')
+                # SECURITY: Create private container (no public access)
+                container_client.create_container()
+                logger.info(f"Created PRIVATE container: {self.container_name}")
         except Exception as e:
-            print(f"Warning: Could not ensure container exists: {e}")
+            logger.error(f"Warning: Could not ensure container exists: {e}")
 
     def is_enabled(self) -> bool:
         """Check if Azure Blob Storage is enabled."""
@@ -315,35 +317,41 @@ class AzureBlobStorage:
             if not blob_client.exists():
                 return None
 
-            # Try to generate SAS token if we have account key
+            # SECURITY: Always generate SAS token with TTL - no fallback to public URL
             try:
                 # Get account key from connection string
                 connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-                if connection_string:
-                    # Extract account name and key from connection string
-                    parts = dict(item.split('=', 1) for item in connection_string.split(';') if '=' in item)
-                    account_name = parts.get('AccountName')
-                    account_key = parts.get('AccountKey')
+                if not connection_string:
+                    logger.error("AZURE_STORAGE_CONNECTION_STRING not configured - cannot generate SAS URL")
+                    return None
 
-                    if account_name and account_key:
-                        # Generate SAS token
-                        sas_token = generate_blob_sas(
-                            account_name=account_name,
-                            container_name=self.container_name,
-                            blob_name=filename,
-                            account_key=account_key,
-                            permission=BlobSasPermissions(read=True),
-                            expiry=datetime.utcnow() + timedelta(hours=expiry_hours)
-                        )
+                # Extract account name and key from connection string
+                parts = dict(item.split('=', 1) for item in connection_string.split(';') if '=' in item)
+                account_name = parts.get('AccountName')
+                account_key = parts.get('AccountKey')
 
-                        # Return URL with SAS token
-                        return f"{blob_client.url}?{sas_token}"
+                if not account_name or not account_key:
+                    logger.error("Could not extract AccountName or AccountKey from connection string")
+                    return None
+
+                # Generate SAS token with TTL
+                sas_token = generate_blob_sas(
+                    account_name=account_name,
+                    container_name=self.container_name,
+                    blob_name=filename,
+                    account_key=account_key,
+                    permission=BlobSasPermissions(read=True),
+                    expiry=datetime.utcnow() + timedelta(hours=expiry_hours)
+                )
+
+                # Return URL with SAS token
+                sas_url = f"{blob_client.url}?{sas_token}"
+                logger.debug(f"Generated SAS URL for {filename} (expires in {expiry_hours}h)")
+                return sas_url
 
             except Exception as e:
-                logger.warning(f"Could not generate SAS token for {filename}: {e}")
-
-            # Fallback to regular URL (works if blob is public)
-            return blob_client.url
+                logger.error(f"Failed to generate SAS token for {filename}: {e}")
+                return None
 
         except Exception as e:
             logger.error(f"Error getting URL for {filename}: {e}")

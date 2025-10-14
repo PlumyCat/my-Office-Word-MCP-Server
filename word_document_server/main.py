@@ -216,7 +216,12 @@ def register_tools():
     def download_document(filename: str):
         """Get download URL for a document."""
         return document_tools.download_document(filename)
-    
+
+    @mcp.tool()
+    def delete_document(filename: str):
+        """Delete a document from storage."""
+        return document_tools.delete_document(filename)
+
     @mcp.tool()
     def insert_header_near_text(filename: str, target_text: str = None, header_title: str = None, position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: int = None):
         """Insert a header (with specified style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), header_title (str), position ('before' or 'after'), header_style (str, default 'Heading 1'), target_paragraph_index (int, optional)."""

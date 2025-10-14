@@ -316,3 +316,40 @@ async def check_document_exists(filename: str) -> str:
 
     except Exception as e:
         return f"Failed to check document existence: {str(e)}"
+
+
+async def delete_document(filename: str) -> str:
+    """
+    Delete a document from storage.
+
+    Args:
+        filename: Name of the document to delete (with or without .docx extension)
+
+    Returns:
+        Success message or error description
+    """
+    filename = ensure_docx_extension(filename)
+
+    try:
+        from word_document_server.utils.azure_storage import storage
+
+        if not storage.is_enabled():
+            return "Azure Blob Storage is not configured. Cannot delete document."
+
+        # Get blob client
+        blob_client = storage.blob_service_client.get_blob_client(
+            container=storage.container_name,
+            blob=filename
+        )
+
+        # Check if document exists
+        if not blob_client.exists():
+            return f"Document '{filename}' not found in storage"
+
+        # Delete the document
+        blob_client.delete_blob()
+
+        return f"Document '{filename}' deleted successfully"
+
+    except Exception as e:
+        return f"Failed to delete document '{filename}': {str(e)}"

@@ -24,7 +24,8 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_type",
       "mcp__playwright__browser_wait_for",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "mcp__github__search_repositories"
     ],
     "deny": [],
     "ask": []

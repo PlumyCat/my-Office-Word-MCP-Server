@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-10-10T10:29:50.313994",
+  "steps": [
+    {
+      "step": 1,
+      "name": "list_templates",
+      "success": true,
+      "time": 0.17765522003173828
+    },
+    {
+      "step": 2,
+      "name": "create_from_template",
+      "success": true,
+      "time": 0.5431957244873047,
+      "document": "proposal_john_do_1760092190.docx"
+    },
+    {
+      "step": 3,
+      "name": "check_exists",
+      "success": true,
+      "time": 0.2539937496185303
+    },
+    {
+      "step": 4,
+      "name": "get_info",
+      "success": true,
+      "time": 0.15407991409301758
+    },
+    {
+      "step": 5,
+      "name": "download_url",
+      "success": true,
+      "time": 0.0809931755065918
+    },
+    {
+      "step": 6,
+      "name": "verify_replacements",
+      "success": true,
+      "time": 0.16753435134887695
+    }
+  ],
+  "success": true,
+  "total_time": 1.3790831565856934,
+  "replacements_ok": true
+}

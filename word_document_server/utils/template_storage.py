@@ -54,6 +54,33 @@ class TemplateStorage:
         # Use the direct category structure: category/template_name.docx
         return f"{category}/{template_name}"
 
+    def _ensure_category_placeholder(self, category: str) -> None:
+        """
+        Ensure a placeholder file exists in the category folder to maintain folder structure.
+        Azure Blob Storage doesn't have real folders - they're simulated with path prefixes.
+        If all files in a "folder" are deleted, the folder disappears.
+        This placeholder ensures user folders persist.
+        """
+        if not self.blob_service_client or category == "general":
+            return
+
+        try:
+            container_client = self.blob_service_client.get_container_client(self.templates_container)
+            placeholder_name = f"{category}/.keep"
+            blob_client = container_client.get_blob_client(placeholder_name)
+
+            # Only create if doesn't exist
+            if not blob_client.exists():
+                # Create tiny placeholder file
+                blob_client.upload_blob(
+                    b"# Placeholder to maintain folder structure",
+                    overwrite=False,
+                    metadata={'type': 'placeholder', 'hidden': 'true'}
+                )
+                logger.info(f"Created placeholder for category '{category}'")
+        except Exception as e:
+            logger.warning(f"Could not create placeholder for '{category}': {e}")
+
     def list_templates(self, category: Optional[str] = None) -> Tuple[bool, List[Dict[str, Any]], str]:
         """
         List all available templates.
@@ -80,6 +107,10 @@ class TemplateStorage:
             blobs = container_client.list_blobs(name_starts_with=prefix)
 
             for blob in blobs:
+                # Skip placeholder files (.keep)
+                if blob.name.endswith('/.keep') or blob.name.endswith('.keep'):
+                    continue
+
                 if blob.name.endswith('.docx'):
                     # Parse template info from blob name and metadata
                     path_parts = blob.name.split('/')
@@ -194,6 +225,9 @@ class TemplateStorage:
                 content_settings=content_settings
             )
 
+            # Ensure placeholder exists for this category folder
+            self._ensure_category_placeholder(category)
+
             logger.info(f"Template '{template_name}' saved to category '{category}'")
             return True, f"Template '{template_name}' saved successfully in category '{category}'"
 
@@ -260,33 +294,41 @@ class TemplateStorage:
             # Generate SAS URL for download
             from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 
-            # Try to get account key from connection string or separate env var
-            account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY')
-            account_name = blob_client.account_name
-
-            if not account_key:
-                # Try extracting from connection string
+            # SECURITY: Always generate SAS token with TTL - no fallback to public URL
+            try:
+                # Get account key from connection string
                 connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-                if connection_string:
-                    parts = dict(item.split('=', 1) for item in connection_string.split(';') if '=' in item)
-                    account_key = parts.get('AccountKey')
-                    if not account_name:
-                        account_name = parts.get('AccountName')
+                if not connection_string:
+                    logger.error("AZURE_STORAGE_CONNECTION_STRING not configured - cannot generate SAS URL")
+                    return None
 
-            if not account_key or not account_name:
-                logger.warning("No account key/name available for SAS URL generation")
-                return blob_client.url  # Fallback to regular URL
+                # Extract account name and key from connection string
+                parts = dict(item.split('=', 1) for item in connection_string.split(';') if '=' in item)
+                account_name = parts.get('AccountName')
+                account_key = parts.get('AccountKey')
 
-            sas_token = generate_blob_sas(
-                account_name=account_name,
-                container_name=self.templates_container,
-                blob_name=blob_name,
-                account_key=account_key,
-                permission=BlobSasPermissions(read=True),
-                expiry=datetime.utcnow() + timedelta(hours=expires_hours)
-            )
+                if not account_name or not account_key:
+                    logger.error("Could not extract AccountName or AccountKey from connection string")
+                    return None
 
-            return f"{blob_client.url}?{sas_token}"
+                # Generate SAS token with TTL
+                sas_token = generate_blob_sas(
+                    account_name=account_name,
+                    container_name=self.templates_container,
+                    blob_name=blob_name,
+                    account_key=account_key,
+                    permission=BlobSasPermissions(read=True),
+                    expiry=datetime.utcnow() + timedelta(hours=expires_hours)
+                )
+
+                # Return URL with SAS token
+                sas_url = f"{blob_client.url}?{sas_token}"
+                logger.debug(f"Generated SAS URL for {blob_name} (expires in {expires_hours}h)")
+                return sas_url
+
+            except Exception as e:
+                logger.error(f"Failed to generate SAS token for {blob_name}: {e}")
+                return None
 
         except Exception as e:
             logger.error(f"Failed to generate template URL: {str(e)}")

@@ -1,0 +1,26 @@
+# Dockerfile for Word MCP Connector Wrapper
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir fastapi uvicorn[standard] pydantic
+
+# Copy application code
+COPY word_document_server/ ./word_document_server/
+COPY connector_wrapper.py .
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables
+ENV MCP_TRANSPORT=http
+ENV PORT=8080
+ENV PYTHONUNBUFFERED=1
+
+# Run the connector wrapper
+CMD ["python", "-m", "uvicorn", "connector_wrapper:app", "--host", "0.0.0.0", "--port", "8080"]

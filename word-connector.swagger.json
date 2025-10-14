@@ -1,0 +1,3524 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Word Document MCP Connector - Complete",
+    "description": "REST API wrapper for Word MCP Server - 67 tools",
+    "version": "2.0"
+  },
+  "host": "word-mcp-connector.ashywater-9eb5a210.francecentral.azurecontainerapps.io",
+  "basePath": "/api",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/create/document": {
+      "post": {
+        "operationId": "CreateDocument",
+        "summary": "Create a new Word document with optional metadata.",
+        "description": "Create a new Word document with optional metadata.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "title parameter",
+                  "x-ms-summary": "Title"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "author parameter",
+                  "x-ms-summary": "Author"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/copy/document": {
+      "post": {
+        "operationId": "CopyDocument",
+        "summary": "Create a copy of a Word document.",
+        "description": "Create a copy of a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "source_filename": {
+                  "type": "string",
+                  "description": "source_filename parameter",
+                  "x-ms-summary": "Source Filename"
+                },
+                "destination_filename": {
+                  "type": "string",
+                  "description": "destination_filename parameter",
+                  "x-ms-summary": "Destination Filename"
+                }
+              },
+              "required": [
+                "source_filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/document/info": {
+      "post": {
+        "operationId": "GetDocumentInfo",
+        "summary": "Get information about a Word document.",
+        "description": "Get information about a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/document/text": {
+      "post": {
+        "operationId": "GetDocumentText",
+        "summary": "Extract all text from a Word document.",
+        "description": "Extract all text from a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/document/outline": {
+      "post": {
+        "operationId": "GetDocumentOutline",
+        "summary": "Get the structure of a Word document.",
+        "description": "Get the structure of a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/list/available/documents": {
+      "get": {
+        "operationId": "ListAvailableDocuments",
+        "summary": "List all .docx files in the specified directory.",
+        "description": "List all .docx files in the specified directory.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debug/storage": {
+      "get": {
+        "operationId": "DebugStorage",
+        "summary": "Debug storage configuration and show available documents.",
+        "description": "Debug storage configuration and show available documents.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/check/document/exists": {
+      "post": {
+        "operationId": "CheckDocumentExists",
+        "summary": "Check if a document exists in storage with detailed diagnostics.",
+        "description": "Check if a document exists in storage with detailed diagnostics.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/document/xml": {
+      "get": {
+        "operationId": "GetDocumentXml",
+        "summary": "Get the raw XML structure of a Word document.",
+        "description": "Get the raw XML structure of a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cleanup/expired/documents": {
+      "post": {
+        "operationId": "CleanupExpiredDocuments",
+        "summary": "Clean up expired documents from storage (TTL cleanup).",
+        "description": "Clean up expired documents from storage (TTL cleanup).",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/download/document": {
+      "post": {
+        "operationId": "DownloadDocument",
+        "summary": "Get download URL for a document.",
+        "description": "Get download URL for a document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/insert/header/near/text": {
+      "post": {
+        "operationId": "InsertHeaderNearText",
+        "summary": "Insert a header (with specified style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), header_title (str), position ('before' or 'after'), header_style (str, default 'Heading 1'), target_paragraph_index (int, optional).",
+        "description": "Insert a header (with specified style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), header_title (str), position ('before' or 'after'), header_style (str, default 'Heading 1'), target_paragraph_index (int, optional).",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "doc_path": {
+                  "type": "string",
+                  "description": "Document filename in Azure Blob Storage (e.g., 'my_document.docx')",
+                  "x-ms-summary": "Document Filename"
+                },
+                "target_text": {
+                  "type": "string",
+                  "description": "target_text parameter",
+                  "x-ms-summary": "Target Text"
+                },
+                "header_title": {
+                  "type": "string",
+                  "description": "header_title parameter",
+                  "x-ms-summary": "Header Title"
+                },
+                "position": {
+                  "type": "string",
+                  "description": "position parameter",
+                  "x-ms-summary": "Position"
+                },
+                "header_style": {
+                  "type": "string",
+                  "description": "header_style parameter",
+                  "x-ms-summary": "Header Style"
+                },
+                "target_paragraph_index": {
+                  "type": "integer",
+                  "description": "target_paragraph_index parameter",
+                  "x-ms-summary": "Target Paragraph Index"
+                }
+              },
+              "required": [
+                "doc_path"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/insert/line/or/paragraph/near/text": {
+      "post": {
+        "operationId": "InsertLineOrParagraphNearText",
+        "summary": "Insert a new line or paragraph (with specified or matched style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), line_text (str), position ('before' or 'after'), line_style (str, optional), target_paragraph_index (int, optional).",
+        "description": "Insert a new line or paragraph (with specified or matched style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), line_text (str), position ('before' or 'after'), line_style (str, optional), target_paragraph_index (int, optional).",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "doc_path": {
+                  "type": "string",
+                  "description": "Document filename in Azure Blob Storage (e.g., 'my_document.docx')",
+                  "x-ms-summary": "Document Filename"
+                },
+                "target_text": {
+                  "type": "string",
+                  "description": "target_text parameter",
+                  "x-ms-summary": "Target Text"
+                },
+                "line_text": {
+                  "type": "string",
+                  "description": "line_text parameter",
+                  "x-ms-summary": "Line Text"
+                },
+                "position": {
+                  "type": "string",
+                  "description": "position parameter",
+                  "x-ms-summary": "Position"
+                },
+                "line_style": {
+                  "type": "string",
+                  "description": "line_style parameter",
+                  "x-ms-summary": "Line Style"
+                },
+                "target_paragraph_index": {
+                  "type": "integer",
+                  "description": "target_paragraph_index parameter",
+                  "x-ms-summary": "Target Paragraph Index"
+                }
+              },
+              "required": [
+                "doc_path"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/insert/numbered/list/near/text": {
+      "get": {
+        "operationId": "InsertNumberedListNearText",
+        "summary": "Insert a numbered list before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), list_items (list of str), position ('before' or 'after'), target_paragraph_index (int, optional).",
+        "description": "Insert a numbered list before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), list_items (list of str), position ('before' or 'after'), target_paragraph_index (int, optional).",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/add/paragraph": {
+      "post": {
+        "operationId": "AddParagraph",
+        "summary": "Add a paragraph to a Word document.",
+        "description": "Add a paragraph to a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "text parameter",
+                  "x-ms-summary": "Text"
+                },
+                "style": {
+                  "type": "string",
+                  "description": "style parameter",
+                  "x-ms-summary": "Style"
+                }
+              },
+              "required": [
+                "filename",
+                "text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/heading": {
+      "post": {
+        "operationId": "AddHeading",
+        "summary": "Add a heading to a Word document.",
+        "description": "Add a heading to a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "text parameter",
+                  "x-ms-summary": "Text"
+                },
+                "level": {
+                  "type": "integer",
+                  "description": "level parameter",
+                  "x-ms-summary": "Level"
+                }
+              },
+              "required": [
+                "filename",
+                "text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/picture": {
+      "post": {
+        "operationId": "AddPicture",
+        "summary": "Add an image to a Word document.",
+        "description": "Add an image to a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "image_path": {
+                  "type": "string",
+                  "description": "image_path parameter",
+                  "x-ms-summary": "Image Path"
+                },
+                "width": {
+                  "type": "number",
+                  "description": "width parameter",
+                  "x-ms-summary": "Width"
+                }
+              },
+              "required": [
+                "filename",
+                "image_path"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/table": {
+      "post": {
+        "operationId": "AddTable",
+        "summary": "Add a table to a Word document.",
+        "description": "Add a table to a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "rows": {
+                  "type": "integer",
+                  "description": "rows parameter",
+                  "x-ms-summary": "Rows"
+                },
+                "cols": {
+                  "type": "integer",
+                  "description": "cols parameter",
+                  "x-ms-summary": "Cols"
+                },
+                "data": {
+                  "type": "array",
+                  "description": "data parameter",
+                  "x-ms-summary": "Data",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "filename",
+                "rows",
+                "cols"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/page/break": {
+      "post": {
+        "operationId": "AddPageBreak",
+        "summary": "Add a page break to the document.",
+        "description": "Add a page break to the document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/delete/paragraph": {
+      "post": {
+        "operationId": "DeleteParagraph",
+        "summary": "Delete a paragraph from a document.",
+        "description": "Delete a paragraph from a document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/search/and/replace": {
+      "post": {
+        "operationId": "SearchAndReplace",
+        "summary": "Search for text and replace all occurrences.",
+        "description": "Search for text and replace all occurrences.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "find_text": {
+                  "type": "string",
+                  "description": "find_text parameter",
+                  "x-ms-summary": "Find Text"
+                },
+                "replace_text": {
+                  "type": "string",
+                  "description": "replace_text parameter",
+                  "x-ms-summary": "Replace Text"
+                }
+              },
+              "required": [
+                "filename",
+                "find_text",
+                "replace_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/create/custom/style": {
+      "post": {
+        "operationId": "CreateCustomStyle",
+        "summary": "Create a custom style in the document.",
+        "description": "Create a custom style in the document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "style_name": {
+                  "type": "string",
+                  "description": "style_name parameter",
+                  "x-ms-summary": "Style Name"
+                },
+                "bold": {
+                  "type": "boolean",
+                  "description": "bold parameter",
+                  "x-ms-summary": "Bold"
+                },
+                "italic": {
+                  "type": "boolean",
+                  "description": "italic parameter",
+                  "x-ms-summary": "Italic"
+                },
+                "font_size": {
+                  "type": "integer",
+                  "description": "font_size parameter",
+                  "x-ms-summary": "Font Size"
+                },
+                "font_name": {
+                  "type": "string",
+                  "description": "font_name parameter",
+                  "x-ms-summary": "Font Name"
+                },
+                "color": {
+                  "type": "string",
+                  "description": "color parameter",
+                  "x-ms-summary": "Color"
+                },
+                "base_style": {
+                  "type": "string",
+                  "description": "base_style parameter",
+                  "x-ms-summary": "Base Style"
+                }
+              },
+              "required": [
+                "filename",
+                "style_name"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/format/text": {
+      "post": {
+        "operationId": "FormatText",
+        "summary": "Format a specific range of text within a paragraph.",
+        "description": "Format a specific range of text within a paragraph.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                },
+                "start_pos": {
+                  "type": "integer",
+                  "description": "start_pos parameter",
+                  "x-ms-summary": "Start Pos"
+                },
+                "end_pos": {
+                  "type": "integer",
+                  "description": "end_pos parameter",
+                  "x-ms-summary": "End Pos"
+                },
+                "bold": {
+                  "type": "boolean",
+                  "description": "bold parameter",
+                  "x-ms-summary": "Bold"
+                },
+                "italic": {
+                  "type": "boolean",
+                  "description": "italic parameter",
+                  "x-ms-summary": "Italic"
+                },
+                "underline": {
+                  "type": "boolean",
+                  "description": "underline parameter",
+                  "x-ms-summary": "Underline"
+                },
+                "color": {
+                  "type": "string",
+                  "description": "color parameter",
+                  "x-ms-summary": "Color"
+                },
+                "font_size": {
+                  "type": "integer",
+                  "description": "font_size parameter",
+                  "x-ms-summary": "Font Size"
+                },
+                "font_name": {
+                  "type": "string",
+                  "description": "font_name parameter",
+                  "x-ms-summary": "Font Name"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index",
+                "start_pos",
+                "end_pos"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/format/table": {
+      "post": {
+        "operationId": "FormatTable",
+        "summary": "Format a table with borders, shading, and structure.",
+        "description": "Format a table with borders, shading, and structure.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "has_header_row": {
+                  "type": "boolean",
+                  "description": "has_header_row parameter",
+                  "x-ms-summary": "Has Header Row"
+                },
+                "border_style": {
+                  "type": "string",
+                  "description": "border_style parameter",
+                  "x-ms-summary": "Border Style"
+                },
+                "shading": {
+                  "type": "array",
+                  "description": "shading parameter",
+                  "x-ms-summary": "Shading",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "filename",
+                "table_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/cell/shading": {
+      "post": {
+        "operationId": "SetTableCellShading",
+        "summary": "Apply shading/filling to a specific table cell.",
+        "description": "Apply shading/filling to a specific table cell.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "row_index": {
+                  "type": "integer",
+                  "description": "row_index parameter",
+                  "x-ms-summary": "Row Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "fill_color": {
+                  "type": "string",
+                  "description": "fill_color parameter",
+                  "x-ms-summary": "Fill Color"
+                },
+                "pattern": {
+                  "type": "string",
+                  "description": "pattern parameter",
+                  "x-ms-summary": "Pattern"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "row_index",
+                "col_index",
+                "fill_color"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/apply/table/alternating/rows": {
+      "post": {
+        "operationId": "ApplyTableAlternatingRows",
+        "summary": "Apply alternating row colors to a table for better readability.",
+        "description": "Apply alternating row colors to a table for better readability.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "color1": {
+                  "type": "string",
+                  "description": "color1 parameter",
+                  "x-ms-summary": "Color1"
+                },
+                "color2": {
+                  "type": "string",
+                  "description": "color2 parameter",
+                  "x-ms-summary": "Color2"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/highlight/table/header": {
+      "post": {
+        "operationId": "HighlightTableHeader",
+        "summary": "Apply special highlighting to table header row.",
+        "description": "Apply special highlighting to table header row.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "header_color": {
+                  "type": "string",
+                  "description": "header_color parameter",
+                  "x-ms-summary": "Header Color"
+                },
+                "text_color": {
+                  "type": "string",
+                  "description": "text_color parameter",
+                  "x-ms-summary": "Text Color"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/merge/table/cells": {
+      "post": {
+        "operationId": "MergeTableCells",
+        "summary": "Merge cells in a rectangular area of a table.",
+        "description": "Merge cells in a rectangular area of a table.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "start_row": {
+                  "type": "integer",
+                  "description": "start_row parameter",
+                  "x-ms-summary": "Start Row"
+                },
+                "start_col": {
+                  "type": "integer",
+                  "description": "start_col parameter",
+                  "x-ms-summary": "Start Col"
+                },
+                "end_row": {
+                  "type": "integer",
+                  "description": "end_row parameter",
+                  "x-ms-summary": "End Row"
+                },
+                "end_col": {
+                  "type": "integer",
+                  "description": "end_col parameter",
+                  "x-ms-summary": "End Col"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "start_row",
+                "start_col",
+                "end_row",
+                "end_col"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/merge/table/cells/horizontal": {
+      "post": {
+        "operationId": "MergeTableCellsHorizontal",
+        "summary": "Merge cells horizontally in a single row.",
+        "description": "Merge cells horizontally in a single row.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "row_index": {
+                  "type": "integer",
+                  "description": "row_index parameter",
+                  "x-ms-summary": "Row Index"
+                },
+                "start_col": {
+                  "type": "integer",
+                  "description": "start_col parameter",
+                  "x-ms-summary": "Start Col"
+                },
+                "end_col": {
+                  "type": "integer",
+                  "description": "end_col parameter",
+                  "x-ms-summary": "End Col"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "row_index",
+                "start_col",
+                "end_col"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/merge/table/cells/vertical": {
+      "post": {
+        "operationId": "MergeTableCellsVertical",
+        "summary": "Merge cells vertically in a single column.",
+        "description": "Merge cells vertically in a single column.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "start_row": {
+                  "type": "integer",
+                  "description": "start_row parameter",
+                  "x-ms-summary": "Start Row"
+                },
+                "end_row": {
+                  "type": "integer",
+                  "description": "end_row parameter",
+                  "x-ms-summary": "End Row"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "col_index",
+                "start_row",
+                "end_row"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/cell/alignment": {
+      "post": {
+        "operationId": "SetTableCellAlignment",
+        "summary": "Set text alignment for a specific table cell.",
+        "description": "Set text alignment for a specific table cell.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "row_index": {
+                  "type": "integer",
+                  "description": "row_index parameter",
+                  "x-ms-summary": "Row Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "horizontal": {
+                  "type": "string",
+                  "description": "horizontal parameter",
+                  "x-ms-summary": "Horizontal"
+                },
+                "vertical": {
+                  "type": "string",
+                  "description": "vertical parameter",
+                  "x-ms-summary": "Vertical"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "row_index",
+                "col_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/alignment/all": {
+      "post": {
+        "operationId": "SetTableAlignmentAll",
+        "summary": "Set text alignment for all cells in a table.",
+        "description": "Set text alignment for all cells in a table.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "horizontal": {
+                  "type": "string",
+                  "description": "horizontal parameter",
+                  "x-ms-summary": "Horizontal"
+                },
+                "vertical": {
+                  "type": "string",
+                  "description": "vertical parameter",
+                  "x-ms-summary": "Vertical"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/protect/document": {
+      "post": {
+        "operationId": "ProtectDocument",
+        "summary": "Add password protection to a Word document.",
+        "description": "Add password protection to a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "password parameter",
+                  "x-ms-summary": "Password"
+                }
+              },
+              "required": [
+                "filename",
+                "password"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/unprotect/document": {
+      "post": {
+        "operationId": "UnprotectDocument",
+        "summary": "Remove password protection from a Word document.",
+        "description": "Remove password protection from a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "password parameter",
+                  "x-ms-summary": "Password"
+                }
+              },
+              "required": [
+                "filename",
+                "password"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/footnote/to/document": {
+      "post": {
+        "operationId": "AddFootnoteToDocument",
+        "summary": "Add a footnote to a specific paragraph in a Word document.",
+        "description": "Add a footnote to a specific paragraph in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                },
+                "footnote_text": {
+                  "type": "string",
+                  "description": "footnote_text parameter",
+                  "x-ms-summary": "Footnote Text"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index",
+                "footnote_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/footnote/after/text": {
+      "post": {
+        "operationId": "AddFootnoteAfterText",
+        "summary": "Add a footnote after specific text with proper superscript formatting.",
+        "description": "Add a footnote after specific text with proper superscript formatting.\n        This enhanced function ensures footnotes display correctly as superscript.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "search_text parameter",
+                  "x-ms-summary": "Search Text"
+                },
+                "footnote_text": {
+                  "type": "string",
+                  "description": "footnote_text parameter",
+                  "x-ms-summary": "Footnote Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                }
+              },
+              "required": [
+                "filename",
+                "search_text",
+                "footnote_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/footnote/before/text": {
+      "post": {
+        "operationId": "AddFootnoteBeforeText",
+        "summary": "Add a footnote before specific text with proper superscript formatting.",
+        "description": "Add a footnote before specific text with proper superscript formatting.\n        This enhanced function ensures footnotes display correctly as superscript.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "search_text parameter",
+                  "x-ms-summary": "Search Text"
+                },
+                "footnote_text": {
+                  "type": "string",
+                  "description": "footnote_text parameter",
+                  "x-ms-summary": "Footnote Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                }
+              },
+              "required": [
+                "filename",
+                "search_text",
+                "footnote_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/footnote/enhanced": {
+      "post": {
+        "operationId": "AddFootnoteEnhanced",
+        "summary": "Enhanced footnote addition with guaranteed superscript formatting.",
+        "description": "Enhanced footnote addition with guaranteed superscript formatting.\n        Adds footnote at the end of a specific paragraph with proper style handling.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                },
+                "footnote_text": {
+                  "type": "string",
+                  "description": "footnote_text parameter",
+                  "x-ms-summary": "Footnote Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index",
+                "footnote_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/endnote/to/document": {
+      "post": {
+        "operationId": "AddEndnoteToDocument",
+        "summary": "Add an endnote to a specific paragraph in a Word document.",
+        "description": "Add an endnote to a specific paragraph in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                },
+                "endnote_text": {
+                  "type": "string",
+                  "description": "endnote_text parameter",
+                  "x-ms-summary": "Endnote Text"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index",
+                "endnote_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/customize/footnote/style": {
+      "post": {
+        "operationId": "CustomizeFootnoteStyle",
+        "summary": "Customize footnote numbering and formatting in a Word document.",
+        "description": "Customize footnote numbering and formatting in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "numbering_format": {
+                  "type": "string",
+                  "description": "numbering_format parameter",
+                  "x-ms-summary": "Numbering Format"
+                },
+                "start_number": {
+                  "type": "integer",
+                  "description": "start_number parameter",
+                  "x-ms-summary": "Start Number"
+                },
+                "font_name": {
+                  "type": "string",
+                  "description": "font_name parameter",
+                  "x-ms-summary": "Font Name"
+                },
+                "font_size": {
+                  "type": "integer",
+                  "description": "font_size parameter",
+                  "x-ms-summary": "Font Size"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/delete/footnote/from/document": {
+      "post": {
+        "operationId": "DeleteFootnoteFromDocument",
+        "summary": "Delete a footnote from a Word document.",
+        "description": "Delete a footnote from a Word document.\n        Identify the footnote either by ID (1, 2, 3, etc.) or by searching for text near it.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "footnote_id": {
+                  "type": "integer",
+                  "description": "footnote_id parameter",
+                  "x-ms-summary": "Footnote Id"
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "search_text parameter",
+                  "x-ms-summary": "Search Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/add/footnote/robust": {
+      "post": {
+        "operationId": "AddFootnoteRobust",
+        "summary": "Add footnote with robust validation and Word compliance.",
+        "description": "Add footnote with robust validation and Word compliance.\n        This is the production-ready version with comprehensive error handling.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "search_text parameter",
+                  "x-ms-summary": "Search Text"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                },
+                "footnote_text": {
+                  "type": "string",
+                  "description": "footnote_text parameter",
+                  "x-ms-summary": "Footnote Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                },
+                "position": {
+                  "type": "string",
+                  "description": "position parameter",
+                  "x-ms-summary": "Position"
+                },
+                "validate_location": {
+                  "type": "boolean",
+                  "description": "validate_location parameter",
+                  "x-ms-summary": "Validate Location"
+                },
+                "auto_repair": {
+                  "type": "boolean",
+                  "description": "auto_repair parameter",
+                  "x-ms-summary": "Auto Repair"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/validate/document/footnotes": {
+      "get": {
+        "operationId": "ValidateDocumentFootnotes",
+        "summary": "Validate all footnotes in document for coherence and compliance.",
+        "description": "Validate all footnotes in document for coherence and compliance.\n        Returns detailed report on ID conflicts, orphaned content, missing styles, etc.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delete/footnote/robust": {
+      "post": {
+        "operationId": "DeleteFootnoteRobust",
+        "summary": "Delete footnote with comprehensive cleanup and orphan removal.",
+        "description": "Delete footnote with comprehensive cleanup and orphan removal.\n        Ensures complete removal from document.xml, footnotes.xml, and relationships.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "footnote_id": {
+                  "type": "integer",
+                  "description": "footnote_id parameter",
+                  "x-ms-summary": "Footnote Id"
+                },
+                "search_text": {
+                  "type": "string",
+                  "description": "search_text parameter",
+                  "x-ms-summary": "Search Text"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                },
+                "clean_orphans": {
+                  "type": "boolean",
+                  "description": "clean_orphans parameter",
+                  "x-ms-summary": "Clean Orphans"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/paragraph/text/from/document": {
+      "post": {
+        "operationId": "GetParagraphTextFromDocument",
+        "summary": "Get text from a specific paragraph in a Word document.",
+        "description": "Get text from a specific paragraph in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/find/text/in/document": {
+      "post": {
+        "operationId": "FindTextInDocument",
+        "summary": "Find occurrences of specific text in a Word document.",
+        "description": "Find occurrences of specific text in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "text_to_find": {
+                  "type": "string",
+                  "description": "text_to_find parameter",
+                  "x-ms-summary": "Text To Find"
+                },
+                "match_case": {
+                  "type": "boolean",
+                  "description": "match_case parameter",
+                  "x-ms-summary": "Match Case"
+                },
+                "whole_word": {
+                  "type": "boolean",
+                  "description": "whole_word parameter",
+                  "x-ms-summary": "Whole Word"
+                }
+              },
+              "required": [
+                "filename",
+                "text_to_find"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/convert/to/pdf": {
+      "post": {
+        "operationId": "ConvertToPdf",
+        "summary": "Convert a Word document to PDF format.",
+        "description": "Convert a Word document to PDF format.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "output_filename": {
+                  "type": "string",
+                  "description": "output_filename parameter",
+                  "x-ms-summary": "Output Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/replace/paragraph/block/below/header": {
+      "post": {
+        "operationId": "ReplaceParagraphBlockBelowHeader",
+        "summary": "Replace paragraph block below header",
+        "description": "Replace the paragraph block below a header, avoiding TOC modifications.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "doc_path": {
+                  "type": "string",
+                  "description": "Document filename in Azure Blob Storage (e.g., 'my_document.docx')",
+                  "x-ms-summary": "Document Filename"
+                },
+                "header_text": {
+                  "type": "string",
+                  "description": "header_text parameter",
+                  "x-ms-summary": "Header Text"
+                },
+                "new_paragraphs": {
+                  "type": "array",
+                  "description": "new_paragraphs parameter",
+                  "x-ms-summary": "New Paragraphs",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "detect_block_end_fn": {
+                  "type": "string",
+                  "description": "detect_block_end_fn parameter",
+                  "x-ms-summary": "Detect Block End Fn"
+                },
+                "new_paragraph_style": {
+                  "type": "string",
+                  "description": "new_paragraph_style parameter",
+                  "x-ms-summary": "New Paragraph Style"
+                }
+              },
+              "required": [
+                "doc_path",
+                "header_text",
+                "new_paragraphs"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/replace/block/between/manual/anchors": {
+      "post": {
+        "operationId": "ReplaceBlockBetweenManualAnchors",
+        "summary": "Replace all content between start_anchor_text and end_anchor_text (or next logical header if not provided).",
+        "description": "Replace all content between start_anchor_text and end_anchor_text (or next logical header if not provided).",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "doc_path": {
+                  "type": "string",
+                  "description": "Document filename in Azure Blob Storage (e.g., 'my_document.docx')",
+                  "x-ms-summary": "Document Filename"
+                },
+                "start_anchor_text": {
+                  "type": "string",
+                  "description": "start_anchor_text parameter",
+                  "x-ms-summary": "Start Anchor Text"
+                },
+                "new_paragraphs": {
+                  "type": "array",
+                  "description": "new_paragraphs parameter",
+                  "x-ms-summary": "New Paragraphs",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "end_anchor_text": {
+                  "type": "string",
+                  "description": "end_anchor_text parameter",
+                  "x-ms-summary": "End Anchor Text"
+                },
+                "match_fn": {
+                  "type": "string",
+                  "description": "match_fn parameter",
+                  "x-ms-summary": "Match Fn"
+                },
+                "new_paragraph_style": {
+                  "type": "string",
+                  "description": "new_paragraph_style parameter",
+                  "x-ms-summary": "New Paragraph Style"
+                }
+              },
+              "required": [
+                "doc_path",
+                "start_anchor_text",
+                "new_paragraphs"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/all/comments": {
+      "post": {
+        "operationId": "GetAllComments",
+        "summary": "Extract all comments from a Word document.",
+        "description": "Extract all comments from a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/comments/by/author": {
+      "post": {
+        "operationId": "GetCommentsByAuthor",
+        "summary": "Extract comments from a specific author in a Word document.",
+        "description": "Extract comments from a specific author in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "author parameter",
+                  "x-ms-summary": "Author"
+                }
+              },
+              "required": [
+                "filename",
+                "author"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/comments/for/paragraph": {
+      "post": {
+        "operationId": "GetCommentsForParagraph",
+        "summary": "Extract comments for a specific paragraph in a Word document.",
+        "description": "Extract comments for a specific paragraph in a Word document.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "paragraph_index": {
+                  "type": "integer",
+                  "description": "paragraph_index parameter",
+                  "x-ms-summary": "Paragraph Index"
+                }
+              },
+              "required": [
+                "filename",
+                "paragraph_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/column/width": {
+      "post": {
+        "operationId": "SetTableColumnWidth",
+        "summary": "Set the width of a specific table column.",
+        "description": "Set the width of a specific table column.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "width": {
+                  "type": "number",
+                  "description": "width parameter",
+                  "x-ms-summary": "Width"
+                },
+                "width_type": {
+                  "type": "string",
+                  "description": "width_type parameter",
+                  "x-ms-summary": "Width Type"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "col_index",
+                "width"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/column/widths": {
+      "post": {
+        "operationId": "SetTableColumnWidths",
+        "summary": "Set the widths of multiple table columns.",
+        "description": "Set the widths of multiple table columns.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "widths": {
+                  "type": "array",
+                  "description": "widths parameter",
+                  "x-ms-summary": "Widths",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "width_type": {
+                  "type": "string",
+                  "description": "width_type parameter",
+                  "x-ms-summary": "Width Type"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "widths"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/width": {
+      "post": {
+        "operationId": "SetTableWidth",
+        "summary": "Set the overall width of a table.",
+        "description": "Set the overall width of a table.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "width": {
+                  "type": "number",
+                  "description": "width parameter",
+                  "x-ms-summary": "Width"
+                },
+                "width_type": {
+                  "type": "string",
+                  "description": "width_type parameter",
+                  "x-ms-summary": "Width Type"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "width"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/auto/fit/table/columns": {
+      "post": {
+        "operationId": "AutoFitTableColumns",
+        "summary": "Set table columns to auto-fit based on content.",
+        "description": "Set table columns to auto-fit based on content.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/format/table/cell/text": {
+      "post": {
+        "operationId": "FormatTableCellText",
+        "summary": "Format text within a specific table cell.",
+        "description": "Format text within a specific table cell.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "row_index": {
+                  "type": "integer",
+                  "description": "row_index parameter",
+                  "x-ms-summary": "Row Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "text_content": {
+                  "type": "string",
+                  "description": "text_content parameter",
+                  "x-ms-summary": "Text Content"
+                },
+                "bold": {
+                  "type": "boolean",
+                  "description": "bold parameter",
+                  "x-ms-summary": "Bold"
+                },
+                "italic": {
+                  "type": "boolean",
+                  "description": "italic parameter",
+                  "x-ms-summary": "Italic"
+                },
+                "underline": {
+                  "type": "boolean",
+                  "description": "underline parameter",
+                  "x-ms-summary": "Underline"
+                },
+                "color": {
+                  "type": "string",
+                  "description": "color parameter",
+                  "x-ms-summary": "Color"
+                },
+                "font_size": {
+                  "type": "integer",
+                  "description": "font_size parameter",
+                  "x-ms-summary": "Font Size"
+                },
+                "font_name": {
+                  "type": "string",
+                  "description": "font_name parameter",
+                  "x-ms-summary": "Font Name"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "row_index",
+                "col_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/set/table/cell/padding": {
+      "post": {
+        "operationId": "SetTableCellPadding",
+        "summary": "Set padding/margins for a specific table cell.",
+        "description": "Set padding/margins for a specific table cell.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "table_index": {
+                  "type": "integer",
+                  "description": "table_index parameter",
+                  "x-ms-summary": "Table Index"
+                },
+                "row_index": {
+                  "type": "integer",
+                  "description": "row_index parameter",
+                  "x-ms-summary": "Row Index"
+                },
+                "col_index": {
+                  "type": "integer",
+                  "description": "col_index parameter",
+                  "x-ms-summary": "Col Index"
+                },
+                "top": {
+                  "type": "number",
+                  "description": "top parameter",
+                  "x-ms-summary": "Top"
+                },
+                "bottom": {
+                  "type": "number",
+                  "description": "bottom parameter",
+                  "x-ms-summary": "Bottom"
+                },
+                "left": {
+                  "type": "number",
+                  "description": "left parameter",
+                  "x-ms-summary": "Left"
+                },
+                "right": {
+                  "type": "number",
+                  "description": "right parameter",
+                  "x-ms-summary": "Right"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "unit parameter",
+                  "x-ms-summary": "Unit"
+                }
+              },
+              "required": [
+                "filename",
+                "table_index",
+                "row_index",
+                "col_index"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/list/document/templates": {
+      "get": {
+        "operationId": "ListDocumentTemplates",
+        "summary": "List all available document templates, optionally filtered by category.",
+        "description": "List all available document templates, optionally filtered by category.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/add/document/template": {
+      "post": {
+        "operationId": "AddDocumentTemplate",
+        "summary": "Add a document as a template to the template library.",
+        "description": "Add a document as a template to the template library.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "source_document": {
+                  "type": "string",
+                  "description": "source_document parameter",
+                  "x-ms-summary": "Source Document"
+                },
+                "template_name": {
+                  "type": "string",
+                  "description": "template_name parameter",
+                  "x-ms-summary": "Template Name"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "category parameter",
+                  "x-ms-summary": "Category"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "description parameter",
+                  "x-ms-summary": "Description"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "author parameter",
+                  "x-ms-summary": "Author"
+                }
+              },
+              "required": [
+                "source_document",
+                "template_name"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/create/document/from/template": {
+      "post": {
+        "operationId": "CreateDocumentFromTemplate",
+        "summary": "Create a new document from an existing template with optional variable substitution.",
+        "description": "Create a new document from an existing template with optional variable substitution.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "template_name": {
+                  "type": "string",
+                  "description": "template_name parameter",
+                  "x-ms-summary": "Template Name"
+                },
+                "new_document_name": {
+                  "type": "string",
+                  "description": "new_document_name parameter",
+                  "x-ms-summary": "New Document Name"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "category parameter",
+                  "x-ms-summary": "Category"
+                },
+                "variables": {
+                  "type": "object",
+                  "description": "variables parameter",
+                  "x-ms-summary": "Variables",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "template_name",
+                "new_document_name"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/get/template/info": {
+      "post": {
+        "operationId": "GetTemplateInfo",
+        "summary": "Get detailed information about a specific template.",
+        "description": "Get detailed information about a specific template.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "template_name": {
+                  "type": "string",
+                  "description": "template_name parameter",
+                  "x-ms-summary": "Template Name"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "category parameter",
+                  "x-ms-summary": "Category"
+                }
+              },
+              "required": [
+                "template_name"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/delete/document/template": {
+      "post": {
+        "operationId": "DeleteDocumentTemplate",
+        "summary": "Delete a template from the template library.",
+        "description": "Delete a template from the template library.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "template_name": {
+                  "type": "string",
+                  "description": "template_name parameter",
+                  "x-ms-summary": "Template Name"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "category parameter",
+                  "x-ms-summary": "Category"
+                }
+              },
+              "required": [
+                "template_name"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/replace/text/universal": {
+      "post": {
+        "operationId": "ReplaceTextUniversal",
+        "summary": "Universal text replacement that works everywhere in the document.",
+        "description": "Universal text replacement that works everywhere in the document.\n        Searches and replaces in: paragraphs, tables, headers, and footers.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                },
+                "find_text": {
+                  "type": "string",
+                  "description": "find_text parameter",
+                  "x-ms-summary": "Find Text"
+                },
+                "replace_text": {
+                  "type": "string",
+                  "description": "replace_text parameter",
+                  "x-ms-summary": "Replace Text"
+                }
+              },
+              "required": [
+                "filename",
+                "find_text",
+                "replace_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/list/content/controls": {
+      "post": {
+        "operationId": "ListContentControls",
+        "summary": "List all ContentControls (structured fields) in the document.",
+        "description": "List all ContentControls (structured fields) in the document.\n        Note: Feature coming soon.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "description": "filename parameter",
+                  "x-ms-summary": "Filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/list/all/documents": {
+      "get": {
+        "operationId": "ListAllDocuments",
+        "summary": "List ALL Word documents in storage. No parameters needed.",
+        "description": "List ALL Word documents in storage. No parameters needed.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list/all/templates": {
+      "get": {
+        "operationId": "ListAllTemplates",
+        "summary": "List ALL available templates. No parameters needed. Shows all templates in all categories.",
+        "description": "List ALL available templates. No parameters needed. Shows all templates in all categories.",
+        "responses": {
+          "200": {
+            "description": "Succ\u00e8s",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "Result of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "parameters": {},
+  "responses": {},
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "tags": []
+}
