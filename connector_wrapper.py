@@ -33,6 +33,37 @@ app = FastAPI(
     version="2.0"
 )
 
+def shorten_response(response: str) -> str:
+    """
+    Shorten response to minimal format to avoid Copilot Studio content filtering.
+    Keeps only: ok/error + URL (if present).
+    """
+    if not response or not isinstance(response, str):
+        return str(response)
+
+    # Extract URL if present (Azure Blob Storage URL pattern)
+    url = None
+    import re
+    url_match = re.search(r'https://[^\s]+\.blob\.core\.windows\.net/[^\s]+', response)
+    if url_match:
+        url = url_match.group(0)
+
+    # Check if error
+    if any(word in response.lower() for word in ['error', 'failed', 'invalid', 'not found', 'does not exist']):
+        # Extract just the error type
+        if 'not found' in response.lower():
+            return "error: not found"
+        elif 'invalid' in response.lower():
+            return "error: invalid"
+        else:
+            return "error"
+
+    # Success case
+    if url:
+        return f"ok\n{url}"
+    else:
+        return "ok"
+
 # API Key validation
 API_KEY = os.getenv("API_KEY", "")
 
@@ -89,7 +120,7 @@ async def list_all_templates_endpoint(auth: bool = Depends(validate_api_key)):
     """List ALL available templates. No parameters needed."""
     try:
         result = await template_tools.list_document_templates("")
-        return JSONResponse(content={"result": result})
+        return JSONResponse(content={"result": shorten_response(result)})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -98,7 +129,7 @@ async def list_all_documents_endpoint(auth: bool = Depends(validate_api_key)):
     """List ALL Word documents in storage. No parameters needed."""
     try:
         result = await document_tools.list_available_documents(".")
-        return JSONResponse(content={"result": result})
+        return JSONResponse(content={"result": shorten_response(result)})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -124,7 +155,7 @@ async def handle_post(path: str, body: Dict[Any, Any] = Body(...), auth: bool = 
             result = await func(**body)
         else:
             result = func(**body)
-        return JSONResponse(content={"result": result})
+        return JSONResponse(content={"result": shorten_response(result)})
     except TypeError as e:
         raise HTTPException(status_code=400, detail=f"Invalid parameters: {str(e)}")
     except Exception as e:
@@ -161,7 +192,7 @@ async def handle_get(path: str, auth: bool = Depends(validate_api_key)):
                 detail=f"Function {func_name} requires parameters. Use POST instead."
             )
 
-        return JSONResponse(content={"result": result})
+        return JSONResponse(content={"result": shorten_response(result)})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

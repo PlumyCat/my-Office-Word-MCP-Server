@@ -359,7 +359,7 @@ async def create_document_from_template(template_name: str, new_document_name: s
         success, template_data, message = get_template(template_name, category)
 
         if not success:
-            return f"Template '{template_name}' in category '{category}' not found: {message}"
+            return f"error: template not found"
 
         # Load the template as a Document
         doc = Document(io.BytesIO(template_data))
@@ -419,19 +419,15 @@ async def create_document_from_template(template_name: str, new_document_name: s
             # Get document URL if available
             url = get_document_url(new_document_name)
 
-            variables_info = ""
-            if variables:
-                variables_info = f"\nApplied {len(variables)} variable substitution(s): {', '.join(variables.keys())}"
-
             if url:
-                return f"Document '{new_document_name}' created from template '{template_name}' in category '{category}'{variables_info}\nDocument URL: {url}"
+                return f"ok\n{url}"
             else:
-                return f"Document '{new_document_name}' created from template '{template_name}' in category '{category}'{variables_info}"
+                return "ok"
         else:
-            return f"Failed to save new document: {save_message}"
+            return f"error: {save_message}"
 
     except Exception as e:
-        return f"Error creating document from template: {str(e)}"
+        return f"error: {str(e)}"
 
 
 async def get_template_info(template_name: str, category: str = "general") -> str:
