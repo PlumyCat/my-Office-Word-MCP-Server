@@ -329,9 +329,11 @@ async def create_document_from_template(template_name: str, new_document_name: s
     Create a new document from an existing template.
 
     Args:
-        template_name: Name of the template to use
+        template_name: Name of the template to use. Can be either:
+                      - Just the template name (e.g., "MyTemplate") - uses category parameter
+                      - Full path with category (e.g., "Eric FER/MyTemplate") - extracts category from path
         new_document_name: Name for the new document
-        category: Template category (default: "general")
+        category: Template category (default: "general", ignored if template_name contains path)
         variables: Optional dictionary of variables to replace in the document
                   (format: {"{{variable_name}}": "replacement_value"})
 
@@ -343,6 +345,14 @@ async def create_document_from_template(template_name: str, new_document_name: s
     # Clean template name (remove .docx if provided)
     if template_name.endswith('.docx'):
         template_name = template_name[:-5]
+
+    # Check if template_name contains a path separator (category/name format)
+    if '/' in template_name:
+        # Extract category and actual template name from the path
+        path_parts = template_name.rsplit('/', 1)  # Split from right to get last part
+        if len(path_parts) == 2:
+            category = path_parts[0]  # e.g., "Eric FER"
+            template_name = path_parts[1]  # e.g., "Proposition commerciale Modern workplace 2024_1"
 
     try:
         # Get the template from storage
@@ -429,8 +439,10 @@ async def get_template_info(template_name: str, category: str = "general") -> st
     Get detailed information about a specific template.
 
     Args:
-        template_name: Name of the template
-        category: Template category (default: "general")
+        template_name: Name of the template. Can be either:
+                      - Just the template name (e.g., "MyTemplate") - uses category parameter
+                      - Full path with category (e.g., "Eric FER/MyTemplate") - extracts category from path
+        category: Template category (default: "general", ignored if template_name contains path)
 
     Returns:
         JSON string with template information
@@ -438,6 +450,14 @@ async def get_template_info(template_name: str, category: str = "general") -> st
     # Clean template name (remove .docx if provided)
     if template_name.endswith('.docx'):
         template_name = template_name[:-5]
+
+    # Check if template_name contains a path separator (category/name format)
+    if '/' in template_name:
+        # Extract category and actual template name from the path
+        path_parts = template_name.rsplit('/', 1)  # Split from right to get last part
+        if len(path_parts) == 2:
+            category = path_parts[0]  # e.g., "Eric FER"
+            template_name = path_parts[1]  # e.g., "Proposition commerciale Modern workplace 2024_1"
 
     try:
         # Get template data to analyze
@@ -512,8 +532,10 @@ async def delete_document_template(template_name: str, category: str = "general"
     Delete a template from the template library.
 
     Args:
-        template_name: Name of the template to delete
-        category: Template category (default: "general")
+        template_name: Name of the template to delete. Can be either:
+                      - Just the template name (e.g., "MyTemplate") - uses category parameter
+                      - Full path with category (e.g., "Eric FER/MyTemplate") - extracts category from path
+        category: Template category (default: "general", ignored if template_name contains path)
 
     Returns:
         Success message or error description
@@ -521,6 +543,14 @@ async def delete_document_template(template_name: str, category: str = "general"
     # Clean template name (remove .docx if provided)
     if template_name.endswith('.docx'):
         template_name = template_name[:-5]
+
+    # Check if template_name contains a path separator (category/name format)
+    if '/' in template_name:
+        # Extract category and actual template name from the path
+        path_parts = template_name.rsplit('/', 1)  # Split from right to get last part
+        if len(path_parts) == 2:
+            category = path_parts[0]  # e.g., "Eric FER"
+            template_name = path_parts[1]  # e.g., "Proposition commerciale Modern workplace 2024_1"
 
     try:
         from word_document_server.utils.template_storage import delete_template
