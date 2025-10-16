@@ -5,6 +5,7 @@ These tools handle formatting operations for Word documents,
 including text formatting, table formatting, and custom styles.
 """
 import os
+import io
 from typing import List, Optional, Dict, Any
 from docx import Document
 from docx.shared import Pt, RGBColor
@@ -20,6 +21,7 @@ from word_document_server.core.tables import (
     set_column_widths, set_table_width as set_table_width_func, auto_fit_table,
     format_cell_text_by_position, set_cell_padding_by_position
 )
+from word_document_server.utils.azure_storage import get_document_from_storage, save_document_to_storage, get_document_url
 
 
 async def format_text(filename: str, paragraph_index: int, start_pos: int, end_pos: int, 
@@ -189,12 +191,12 @@ async def create_custom_style(filename: str, style_name: str,
         return f"Failed to create style: {str(e)}"
 
 
-async def format_table(filename: str, table_index: int, 
+async def format_table(filename: str, table_index: int,
                       has_header_row: Optional[bool] = None,
                       border_style: Optional[str] = None,
                       shading: Optional[List[List[str]]] = None) -> str:
     """Format a table with borders, shading, and structure.
-    
+
     Args:
         filename: Path to the Word document
         table_index: Index of the table (0-based)
@@ -203,30 +205,41 @@ async def format_table(filename: str, table_index: int,
         shading: 2D list of cell background colors (by row and column)
     """
     filename = ensure_docx_extension(filename)
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot modify document: {error_message}. Consider creating a copy first."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Validate table index
         if table_index < 0 or table_index >= len(doc.tables):
             return f"Invalid table index. Document has {len(doc.tables)} tables (0-{len(doc.tables)-1})."
-        
+
         table = doc.tables[table_index]
-        
+
         # Apply formatting
-        success = apply_table_style(table, has_header_row or False, border_style, shading)
-        
-        if success:
-            doc.save(filename)
-            return f"Table at index {table_index} formatted successfully."
+        success_format = apply_table_style(table, has_header_row or False, border_style, shading)
+
+        if success_format:
+            # Save document back to blob storage
+            doc_buffer = io.BytesIO()
+            doc.save(doc_buffer)
+            doc_data = doc_buffer.getvalue()
+            doc_buffer.close()
+
+            success, save_message = save_document_to_storage(filename, doc_data)
+            if not success:
+                return f"Failed to save document: {save_message}"
+
+            url = get_document_url(filename)
+            if url:
+                return f"Table at index {table_index} formatted successfully. URL: {url}"
+            else:
+                return f"Table at index {table_index} formatted successfully."
         else:
             return f"Failed to format table at index {table_index}."
     except Exception as e:
@@ -291,10 +304,10 @@ async def set_table_cell_shading(filename: str, table_index: int, row_index: int
         return f"Failed to apply cell shading: {str(e)}"
 
 
-async def apply_table_alternating_rows(filename: str, table_index: int, 
+async def apply_table_alternating_rows(filename: str, table_index: int,
                                      color1: str = "FFFFFF", color2: str = "F2F2F2") -> str:
     """Apply alternating row colors to a table for better readability.
-    
+
     Args:
         filename: Path to the Word document
         table_index: Index of the table (0-based)
@@ -302,46 +315,57 @@ async def apply_table_alternating_rows(filename: str, table_index: int,
         color2: Color for even rows (hex string, default light gray)
     """
     filename = ensure_docx_extension(filename)
-    
+
     # Ensure numeric parameters are the correct type
     try:
         table_index = int(table_index)
     except (ValueError, TypeError):
         return "Invalid parameter: table_index must be an integer"
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot modify document: {error_message}. Consider creating a copy first."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Validate table index
         if table_index < 0 or table_index >= len(doc.tables):
             return f"Invalid table index. Document has {len(doc.tables)} tables (0-{len(doc.tables)-1})."
-        
+
         table = doc.tables[table_index]
-        
+
         # Apply alternating row shading
-        success = apply_alternating_row_shading(table, color1, color2)
-        
-        if success:
-            doc.save(filename)
-            return f"Alternating row shading applied successfully to table {table_index}."
+        success_format = apply_alternating_row_shading(table, color1, color2)
+
+        if success_format:
+            # Save document back to blob storage
+            doc_buffer = io.BytesIO()
+            doc.save(doc_buffer)
+            doc_data = doc_buffer.getvalue()
+            doc_buffer.close()
+
+            success, save_message = save_document_to_storage(filename, doc_data)
+            if not success:
+                return f"Failed to save document: {save_message}"
+
+            url = get_document_url(filename)
+            if url:
+                return f"Alternating row shading applied successfully to table {table_index}. URL: {url}"
+            else:
+                return f"Alternating row shading applied successfully to table {table_index}."
         else:
             return f"Failed to apply alternating row shading."
     except Exception as e:
         return f"Failed to apply alternating row shading: {str(e)}"
 
 
-async def highlight_table_header(filename: str, table_index: int, 
+async def highlight_table_header(filename: str, table_index: int,
                                header_color: str = "4472C4", text_color: str = "FFFFFF") -> str:
     """Apply special highlighting to table header row.
-    
+
     Args:
         filename: Path to the Word document
         table_index: Index of the table (0-based)
@@ -349,36 +373,47 @@ async def highlight_table_header(filename: str, table_index: int,
         text_color: Text color for header (hex string, default white)
     """
     filename = ensure_docx_extension(filename)
-    
+
     # Ensure numeric parameters are the correct type
     try:
         table_index = int(table_index)
     except (ValueError, TypeError):
         return "Invalid parameter: table_index must be an integer"
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot modify document: {error_message}. Consider creating a copy first."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Validate table index
         if table_index < 0 or table_index >= len(doc.tables):
             return f"Invalid table index. Document has {len(doc.tables)} tables (0-{len(doc.tables)-1})."
-        
+
         table = doc.tables[table_index]
-        
+
         # Apply header highlighting
-        success = highlight_header_row(table, header_color, text_color)
-        
-        if success:
-            doc.save(filename)
-            return f"Header highlighting applied successfully to table {table_index}."
+        success_format = highlight_header_row(table, header_color, text_color)
+
+        if success_format:
+            # Save document back to blob storage
+            doc_buffer = io.BytesIO()
+            doc.save(doc_buffer)
+            doc_data = doc_buffer.getvalue()
+            doc_buffer.close()
+
+            success, save_message = save_document_to_storage(filename, doc_data)
+            if not success:
+                return f"Failed to save document: {save_message}"
+
+            url = get_document_url(filename)
+            if url:
+                return f"Header highlighting applied successfully to table {table_index}. URL: {url}"
+            else:
+                return f"Header highlighting applied successfully to table {table_index}."
         else:
             return f"Failed to apply header highlighting."
     except Exception as e:
@@ -942,7 +977,7 @@ async def format_table_cell_text(filename: str, table_index: int, row_index: int
                                  underline: Optional[bool] = None, color: Optional[str] = None, font_size: Optional[int] = None,
                                  font_name: Optional[str] = None) -> str:
     """Format text within a specific table cell.
-    
+
     Args:
         filename: Path to the Word document
         table_index: Index of the table (0-based)
@@ -957,7 +992,7 @@ async def format_table_cell_text(filename: str, table_index: int, row_index: int
         font_name: Font name/family
     """
     filename = ensure_docx_extension(filename)
-    
+
     # Ensure numeric parameters are the correct type
     try:
         table_index = int(table_index)
@@ -967,37 +1002,46 @@ async def format_table_cell_text(filename: str, table_index: int, row_index: int
             font_size = int(font_size)
     except (ValueError, TypeError):
         return "Invalid parameter: table_index, row_index, col_index must be integers, font_size must be integer"
-    
-    if not os.path.exists(filename):
-        return f"Document {filename} does not exist"
-    
-    # Check if file is writeable
-    is_writeable, error_message = check_file_writeable(filename)
-    if not is_writeable:
-        return f"Cannot modify document: {error_message}. Consider creating a copy first."
-    
+
     try:
-        doc = Document(filename)
-        
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
         # Validate table index
         if table_index < 0 or table_index >= len(doc.tables):
             return f"Invalid table index. Document has {len(doc.tables)} tables (0-{len(doc.tables)-1})."
-        
+
         table = doc.tables[table_index]
-        
+
         # Validate row and column indices
         if row_index < 0 or row_index >= len(table.rows):
             return f"Invalid row index. Table has {len(table.rows)} rows (0-{len(table.rows)-1})."
-        
+
         if col_index < 0 or col_index >= len(table.rows[row_index].cells):
             return f"Invalid column index. Row has {len(table.rows[row_index].cells)} cells (0-{len(table.rows[row_index].cells)-1})."
-        
+
         # Apply cell text formatting
-        success = format_cell_text_by_position(table, row_index, col_index, text_content, 
+        success_format = format_cell_text_by_position(table, row_index, col_index, text_content,
                                               bold, italic, underline, color, font_size, font_name)
-        
-        if success:
-            doc.save(filename)
+
+        if success_format:
+            # Save document back to blob storage
+            doc_buffer = io.BytesIO()
+            doc.save(doc_buffer)
+            doc_data = doc_buffer.getvalue()
+            doc_buffer.close()
+
+            success, save_message = save_document_to_storage(filename, doc_data)
+            if not success:
+                return f"Failed to save document: {save_message}"
+
+            # Get URL if available
+            url = get_document_url(filename)
             format_desc = []
             if text_content is not None:
                 format_desc.append(f"content='{text_content[:30]}{'...' if len(text_content) > 30 else ''}'")
@@ -1013,9 +1057,12 @@ async def format_table_cell_text(filename: str, table_index: int, row_index: int
                 format_desc.append(f"size={font_size}pt")
             if font_name is not None:
                 format_desc.append(f"font={font_name}")
-            
+
             format_str = ", ".join(format_desc) if format_desc else "no changes"
-            return f"Cell text formatted successfully in table {table_index}, cell ({row_index},{col_index}): {format_str}."
+            if url:
+                return f"Cell text formatted successfully in table {table_index}, cell ({row_index},{col_index}): {format_str}. URL: {url}"
+            else:
+                return f"Cell text formatted successfully in table {table_index}, cell ({row_index},{col_index}): {format_str}."
         else:
             return f"Failed to format cell text. Check that indices are valid."
     except Exception as e:

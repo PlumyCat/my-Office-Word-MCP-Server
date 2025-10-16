@@ -1,513 +1,285 @@
-# Office-Word-MCP-Server
+# Word Document Proposal Generator
 
-[![smithery badge](https://smithery.ai/badge/@GongRzhe/Office-Word-MCP-Server)](https://smithery.ai/server/@GongRzhe/Office-Word-MCP-Server)
+REST API pour la génération automatique de propositions commerciales Microsoft 365 depuis des templates Word avec remplacement de variables et gestion de tableaux.
 
-A Model Context Protocol (MCP) server for creating, reading, and manipulating Microsoft Word documents. This server enables AI assistants to work with Word documents through a standardized interface, providing rich document editing capabilities.
+Conçu pour l'intégration avec **Microsoft Copilot Studio**.
 
-<a href="https://glama.ai/mcp/servers/@GongRzhe/Office-Word-MCP-Server">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@GongRzhe/Office-Word-MCP-Server/badge" alt="Office Word Server MCP server" />
-</a>
+## 🎯 Cas d'Usage
 
-![](https://badge.mcpx.dev?type=server "MCP Server")
+Créer des propositions commerciales professionnelles pour Microsoft 365:
+- ✅ Générer des documents depuis des templates personnalisés
+- ✅ Remplacer automatiquement les variables (nom client, email, téléphone, contenu)
+- ✅ Ajouter des lignes de produits/services dans les tableaux existants
+- ✅ Formater automatiquement les tableaux (bordures, en-têtes colorés, lignes alternées)
+- ✅ Stocker les documents dans Azure Blob Storage
+- ✅ Obtenir des URLs signées pour télécharger les documents
 
-## Overview
+## 📋 Fonctionnalités
 
-Office-Word-MCP-Server implements the [Model Context Protocol](https://modelcontextprotocol.io/) to expose Word document operations as tools and resources. It serves as a bridge between AI assistants and Microsoft Word documents, allowing for document creation, content addition, formatting, and analysis.
+### Gestion de Documents
+- `POST /api/create/document/from/template` - Créer un document depuis un template avec variables
+- `GET /api/get/document/url` - Obtenir l'URL de téléchargement d'un document
+- `GET /api/list/all/documents` - Lister tous les documents générés
+- `POST /api/check/document/exists` - Vérifier si un document existe
+- `POST /api/delete/document` - Supprimer un document
 
-The server features a modular architecture that separates concerns into core functionality, tools, and utilities, making it highly maintainable and extensible for future enhancements.
+### Gestion de Templates
+- `GET /api/list/all/templates` - Lister tous les templates disponibles
+- `POST /api/add/document/template` - Ajouter un nouveau template
+- `POST /api/delete/document/template` - Supprimer un template
 
-### Example
+### Gestion de Contenu
+- `POST /api/add/paragraph` - Ajouter un paragraphe de texte
+- `POST /api/add/heading` - Ajouter un titre de section
+- `POST /api/add/table/with/rows` - Ajouter un nouveau tableau avec données
+- `POST /api/add/table/row` - **Ajouter une ligne à un tableau existant**
 
-#### Pormpt
+### Formatage de Tableaux
+- `POST /api/format/table/with/borders` - Formater un tableau avec bordures
+- `POST /api/highlight/table/header/colors` - Colorer l'en-tête d'un tableau
+- `POST /api/apply/alternating/row/colors` - Appliquer des couleurs alternées
+- `POST /api/format/cell/text/appearance` - Formater une cellule spécifique
 
-![image](https://github.com/user-attachments/assets/f49b0bcc-88b2-4509-bf50-995b9a40038c)
+## 🚀 Déploiement Azure
 
-#### Output
+### Prérequis
 
-![image](https://github.com/user-attachments/assets/ff64385d-3822-4160-8cdf-f8a484ccc01a)
+- Compte Azure avec souscription active
+- Azure CLI installé et connecté (`az login`)
+- Azure Container Registry (ACR)
+- Azure Container Apps Environment
+- Azure Storage Account avec conteneur `word-documents` et `word-templates`
 
-## Features
-
-### Document Management
-
-- Create new Word documents with metadata
-- Extract text and analyze document structure
-- View document properties and statistics
-- List available documents in a directory
-- Create copies of existing documents
-- Merge multiple documents into a single document
-- Convert Word documents to PDF format
-
-### Content Creation
-
-- Add headings with different levels
-- Insert paragraphs with optional styling
-- Create tables with custom data
-- Add images with proportional scaling
-- Insert page breaks
-- Add footnotes and endnotes to documents
-- Convert footnotes to endnotes
-- Customize footnote and endnote styling
-- Create professional table layouts for technical documentation
-- Design callout boxes and formatted content for instructional materials
-- Build structured data tables for business reports with consistent styling
-
-### Rich Text Formatting
-
-- Format specific text sections (bold, italic, underline)
-- Change text color and font properties
-- Apply custom styles to text elements
-- Search and replace text throughout documents
-- Individual cell text formatting within tables
-- Multiple formatting combinations for enhanced visual appeal
-- Font customization with family and size control
-
-### Table Formatting
-
-- Format tables with borders and styles
-- Create header rows with distinct formatting
-- Apply cell shading and custom borders
-- Structure tables for better readability
-- Individual cell background shading with color support
-- Alternating row colors for improved readability
-- Enhanced header row highlighting with custom colors
-- Cell text formatting with bold, italic, underline, color, font size, and font family
-- Comprehensive color support with named colors and hex color codes
-- Cell padding management with independent control of all sides
-- Cell alignment (horizontal and vertical positioning)
-- Cell merging (horizontal, vertical, and rectangular areas)
-- Column width management with multiple units (points, percentage, auto-fit)
-- Auto-fit capabilities for dynamic column sizing
-- Professional callout table support with icon cells and styled content
-
-### Advanced Document Manipulation
-
-- Delete paragraphs
-- Create custom document styles
-- Apply consistent formatting throughout documents
-- Format specific ranges of text with detailed control
-- Flexible padding units with support for points and percentage-based measurements
-- Clear, readable table presentation with proper alignment and spacing
-
-### Document Protection
-
-- Add password protection to documents
-- Implement restricted editing with editable sections
-- Add digital signatures to documents
-- Verify document authenticity and integrity
-
-### Comment Extraction
-
-- Extract all comments from a document
-- Filter comments by author
-- Get comments for specific paragraphs
-- Access comment metadata (author, date, text)
-
-## Installation
-
-### Installing via Smithery
-
-To install Office Word Document Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@GongRzhe/Office-Word-MCP-Server):
+### Variables d'Environnement Requises
 
 ```bash
-npx -y @smithery/cli install @GongRzhe/Office-Word-MCP-Server --client claude
+# Azure Storage
+AZURE_STORAGE_ACCOUNT_NAME=<votre-storage-account>
+AZURE_STORAGE_CONNECTION_STRING=<connection-string>
+
+# API Security (optionnel)
+API_KEY=<votre-cle-api>
+
+# Debug (optionnel)
+DEBUG_MODE=false
 ```
 
-### Prerequisites
-
-- Python 3.8 or higher
-- pip package manager
-
-### Basic Installation
+### Déploiement Rapide
 
 ```bash
-# Clone the repository
-git clone https://github.com/GongRzhe/Office-Word-MCP-Server.git
-cd Office-Word-MCP-Server
+# 1. Cloner le repository
+git clone https://github.com/votre-username/word-proposal-generator.git
+cd word-proposal-generator
 
-# Install dependencies
+# 2. Configurer les variables (editez le script)
+nano deploy-azure-with-storage.sh
+
+# 3. Déployer
+chmod +x deploy-azure-with-storage.sh
+./deploy-azure-with-storage.sh <ACR_NAME> <RESOURCE_GROUP> <ENVIRONMENT_NAME>
+```
+
+Le script va:
+1. Construire l'image Docker et la pousser vers ACR
+2. Créer/mettre à jour le Container App
+3. Configurer l'authentification managed identity avec le Storage Account
+4. Assigner les rôles nécessaires (Storage Blob Data Contributor)
+
+### Déploiement Manuel
+
+```bash
+# Build et push de l'image
+az acr build -t word-proposal-api:latest -r <ACR_NAME> -f Dockerfile.connector .
+
+# Créer Container App
+az containerapp create \
+  --name word-proposal-api \
+  --resource-group <RESOURCE_GROUP> \
+  --environment <ENVIRONMENT_NAME> \
+  --image <ACR_NAME>.azurecr.io/word-proposal-api:latest \
+  --target-port 8080 \
+  --ingress external \
+  --min-replicas 1 \
+  --max-replicas 3 \
+  --env-vars \
+    AZURE_STORAGE_ACCOUNT_NAME=<storage-account> \
+    API_KEY=<your-api-key>
+
+# Activer managed identity
+az containerapp identity assign \
+  --name word-proposal-api \
+  --resource-group <RESOURCE_GROUP> \
+  --system-assigned
+
+# Assigner le rôle Storage Blob Data Contributor
+PRINCIPAL_ID=$(az containerapp show -n word-proposal-api -g <RESOURCE_GROUP> --query identity.principalId -o tsv)
+STORAGE_ID=$(az storage account show -n <STORAGE_ACCOUNT> -g <RESOURCE_GROUP> --query id -o tsv)
+
+az role assignment create \
+  --assignee $PRINCIPAL_ID \
+  --role "Storage Blob Data Contributor" \
+  --scope $STORAGE_ID
+```
+
+## 📖 Utilisation avec Copilot Studio
+
+### Configuration des Actions
+
+1. **Importer le Swagger**: Utiliser `/openapi.json` depuis votre Container App URL
+2. **Ajouter l'API Key**: Configurer l'header `X-API-Key` dans l'authentification
+3. **Créer les Actions**: Voir le guide complet dans `profiles/GUIDE_ACTIONS_COPILOT.md`
+
+### Workflow Typique
+
+```
+User: "Crée une proposition pour Jean Dupont, email j.dupont@mail.com"
+
+Bot: [Appelle create/document/from/template]
+  - template_name: "template-text"
+  - new_document_name: "proposal_jean_dupont"
+  - variables: {
+      "commercialName": "Jean Dupont",
+      "commercialEmail": "j.dupont@mail.com",
+      ...
+    }
+
+Bot: [Appelle add/table/row pour chaque produit Microsoft 365]
+  - filename: "proposal_jean_dupont"
+  - table_index: 0
+  - row_data: ["Microsoft 365 Business Premium", "Description...", "1", "21.00", "25.00"]
+
+Bot: [Appelle highlight/table/header/colors]
+  - filename: "proposal_jean_dupont"
+  - table_index: 0
+  - header_color: "4472C4"
+  - text_color: "FFFFFF"
+
+Bot: "Voici votre proposition: https://storage.blob.core.windows.net/..."
+```
+
+## 🛠️ Développement Local
+
+### Installation
+
+```bash
+# Créer environnement virtuel
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# ou .venv\Scripts\activate  # Windows
+
+# Installer dépendances
 pip install -r requirements.txt
 ```
 
-### Using the Setup Script
-
-Alternatively, you can use the provided setup script which handles:
-
-- Checking prerequisites
-- Setting up a virtual environment
-- Installing dependencies
-- Generating MCP configuration
-
-```bash
-python setup_mcp.py
-```
-
-## Azure Container Apps Deployment
-
-This server can be deployed to Azure Container Apps for cloud-based access and integration with Microsoft Copilot Studio.
-
-### Prerequisites
-
-- Azure CLI installed and configured
-- An Azure subscription
-- Azure Container Registry (ACR)
-- Azure Container Apps Environment
-
-### Quick Deployment with Azure Blob Storage
-
-The recommended deployment method includes Azure Blob Storage for document management:
-
-```bash
-./deploy-azure-with-storage.sh <ACR_NAME> <RESOURCE_GROUP> <ENVIRONMENT_NAME> [API_KEY] [TTL_HOURS]
-```
-
-**Example with API key (RECOMMENDED for production):**
-```bash
-./deploy-azure-with-storage.sh mywordmcpacr my-word-mcp-rg my-word-mcp-env "your-secure-api-key-here" 48
-```
-
-**Example without API key (NOT recommended for production):**
-```bash
-./deploy-azure-with-storage.sh mywordmcpacr my-word-mcp-rg my-word-mcp-env
-```
-
-⚠️ **Security Warning**: Always use an API key for production deployments to prevent unauthorized access.
-
-This script automatically:
-- Builds and pushes the Docker image to ACR
-- Creates an Azure Storage Account (if it doesn't exist)
-- Creates the blob container for documents
-- Deploys the Container App with all required environment variables:
-  - `AZURE_STORAGE_CONNECTION_STRING`
-  - `AZURE_STORAGE_ACCOUNT_KEY`
-  - `AZURE_STORAGE_ACCOUNT_NAME`
-  - `AZURE_STORAGE_CONTAINER_NAME`
-  - `AZURE_TEMPLATES_CONTAINER_NAME`
-- Configures managed identity with appropriate permissions
-- Sets up document TTL (Time To Live) for automatic cleanup
-
-### Simple Deployment (No Storage)
-
-For basic deployment without Azure Blob Storage:
-
-```bash
-./deploy-azure.sh <ACR_NAME> <RESOURCE_GROUP> <ENVIRONMENT_NAME>
-```
-
-### Updating Existing Deployment
-
-#### Update Only Environment Variables (No Rebuild)
-
-Perfect for changing storage credentials or configuration without rebuilding the image:
-
-```bash
-./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP> --env-only --storage-account <STORAGE_ACCOUNT_NAME>
-```
-
-**Example:**
-```bash
-./update-azure-app.sh mywordmcpacr my-word-mcp-rg --env-only --storage-account mywordmcpacrstorage
-```
-
-This retrieves the latest storage credentials from Azure and updates the Container App without rebuilding the Docker image. The container restarts automatically with the new configuration.
-
-#### Add or Update API Key on Existing Deployment
-
-If you deployed without an API key and want to add one (or change it):
-
-```bash
-az containerapp update \
-  --name word-mcp-server \
-  --resource-group <RESOURCE_GROUP> \
-  --set-env-vars API_KEY="your-secure-api-key-here"
-```
-
-**Example:**
-```bash
-az containerapp update \
-  --name word-mcp-server \
-  --resource-group my-word-mcp-rg \
-  --set-env-vars API_KEY="my-super-secret-key-123"
-```
-
-The container will restart automatically with authentication enabled.
-
-#### Update Image and Environment Variables
-
-To update both the Docker image and environment variables:
-
-```bash
-./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP> --storage-account <STORAGE_ACCOUNT_NAME>
-```
-
-#### Update Image Only
-
-To rebuild and update just the Docker image:
-
-```bash
-./update-azure-app.sh <ACR_NAME> <RESOURCE_GROUP>
-```
-
-### Configuration on Azure
-
-All environment variables are configured directly on the Azure Container App - no need to modify `.env` files locally. The deployment scripts automatically retrieve storage credentials from Azure and configure them on the container.
-
-### Security and Authentication
-
-The server supports API key authentication via the `X-API-Key` header for HTTP/SSE transports.
-
-**Authentication Behavior:**
-- ✅ **With API_KEY configured**: All requests require valid `X-API-Key` header
-- ⚠️ **Without API_KEY**: Server runs without authentication (NOT recommended for production)
-- ℹ️ **stdio transport**: No authentication required (local development only)
-
-**Testing with authentication:**
-```bash
-# Without API key (will fail if authentication is enabled)
-curl -X GET "https://<YOUR-APP-URL>/mcp"
-
-# With API key
-curl -X GET "https://<YOUR-APP-URL>/mcp" \
-  -H "X-API-Key: your-secret-key"
-```
-
-### Integration with Copilot Studio
-
-After deployment, configure the MCP server in Microsoft Copilot Studio:
-
-1. Go to your agent → **Tools** → **Add** → **Model Context Protocol**
-2. **Server URL**: `https://<YOUR-APP-URL>/mcp`
-3. **Authentication**:
-   - **Type**: Custom Header
-   - **Header Name**: `X-API-Key`
-   - **Header Value**: Your API key (e.g., `my-super-secret-key-123`)
-
-**Example configuration in Copilot Studio:**
-```json
-{
-  "url": "https://word-mcp-server.azurecontainerapps.io/mcp",
-  "headers": {
-    "X-API-Key": "your-secret-key"
-  }
-}
-```
-
-### Additional Resources
-
-See `AZURE_DEPLOYMENT.md` for complete deployment instructions and troubleshooting.
-
-See `COPILOT_STUDIO_SETUP.md` for Copilot Studio integration guide.
-
-## Usage with Claude for Desktop
-
 ### Configuration
 
-#### Method 1: After Local Installation
+Créer un fichier `.env`:
 
-1. After installation, add the server to your Claude for Desktop configuration file:
-
-```json
-{
-  "mcpServers": {
-    "word-document-server": {
-      "command": "python",
-      "args": ["/path/to/word_mcp_server.py"]
-    }
-  }
-}
+```env
+AZURE_STORAGE_ACCOUNT_NAME=<votre-storage-account>
+AZURE_STORAGE_CONNECTION_STRING=<connection-string>
+API_KEY=<votre-cle-api>
+DEBUG_MODE=true
+PORT=8080
 ```
 
-#### Method 2: Without Installation (Using uvx)
-
-1. You can also configure Claude for Desktop to use the server without local installation by using the uvx package manager:
-
-```json
-{
-  "mcpServers": {
-    "word-document-server": {
-      "command": "uvx",
-      "args": ["--from", "office-word-mcp-server", "word_mcp_server"]
-    }
-  }
-}
-```
-
-2. Configuration file locations:
-
-   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-3. Restart Claude for Desktop to load the configuration.
-
-### Example Operations
-
-Once configured, you can ask Claude to perform operations like:
-
-- "Create a new document called 'report.docx' with a title page"
-- "Add a heading and three paragraphs to my document"
-- "Insert a 4x4 table with sales data"
-- "Format the word 'important' in paragraph 2 to be bold and red"
-- "Search and replace all instances of 'old term' with 'new term'"
-- "Create a custom style for section headings"
-- "Apply formatting to the table in my document"
-- "Extract all comments from my document"
-- "Show me all comments by John Doe"
-- "Get comments for paragraph 3"
-- "Make the text in table cell (1,2) bold and blue with 14pt font"
-- "Add 10 points of padding to all sides of the header cells"
-- "Create a callout table with a blue checkmark icon and white text"
-- "Set the first column width to 50 points and auto-fit the remaining columns"
-- "Apply alternating row colors to make the table more readable"
-
-
-## API Reference
-
-### Document Creation and Properties
-
-```python
-create_document(filename, title=None, author=None)
-get_document_info(filename)
-get_document_text(filename)
-get_document_outline(filename)
-list_available_documents(directory=".")
-copy_document(source_filename, destination_filename=None)
-convert_to_pdf(filename, output_filename=None)
-```
-
-### Content Addition
-
-```python
-add_heading(filename, text, level=1)
-add_paragraph(filename, text, style=None)
-add_table(filename, rows, cols, data=None)
-add_picture(filename, image_path, width=None)
-add_page_break(filename)
-```
-
-### Content Extraction
-
-```python
-get_document_text(filename)
-get_paragraph_text_from_document(filename, paragraph_index)
-find_text_in_document(filename, text_to_find, match_case=True, whole_word=False)
-```
-
-### Text Formatting
-
-```python
-format_text(filename, paragraph_index, start_pos, end_pos, bold=None,
-            italic=None, underline=None, color=None, font_size=None, font_name=None)
-search_and_replace(filename, find_text, replace_text)
-delete_paragraph(filename, paragraph_index)
-create_custom_style(filename, style_name, bold=None, italic=None,
-                    font_size=None, font_name=None, color=None, base_style=None)
-```
-
-### Table Formatting
-
-```python
-format_table(filename, table_index, has_header_row=None,
-             border_style=None, shading=None)
-set_table_cell_shading(filename, table_index, row_index, col_index, 
-                      fill_color, pattern="clear")
-apply_table_alternating_rows(filename, table_index, 
-                            color1="FFFFFF", color2="F2F2F2")
-highlight_table_header(filename, table_index, 
-                      header_color="4472C4", text_color="FFFFFF")
-
-# Cell merging tools
-merge_table_cells(filename, table_index, start_row, start_col, end_row, end_col)
-merge_table_cells_horizontal(filename, table_index, row_index, start_col, end_col)
-merge_table_cells_vertical(filename, table_index, col_index, start_row, end_row)
-
-# Cell alignment tools
-set_table_cell_alignment(filename, table_index, row_index, col_index,
-                        horizontal="left", vertical="top")
-set_table_alignment_all(filename, table_index, 
-                       horizontal="left", vertical="top")
-
-# Cell text formatting tools
-format_table_cell_text(filename, table_index, row_index, col_index,
-                      text_content=None, bold=None, italic=None, underline=None,
-                      color=None, font_size=None, font_name=None)
-
-# Cell padding tools
-set_table_cell_padding(filename, table_index, row_index, col_index,
-                      top=None, bottom=None, left=None, right=None, unit="points")
-
-# Column width management
-set_table_column_width(filename, table_index, col_index, width, width_type="points")
-set_table_column_widths(filename, table_index, widths, width_type="points")
-set_table_width(filename, table_index, width, width_type="points")
-auto_fit_table_columns(filename, table_index)
-```
-
-### Comment Extraction
-
-```python
-get_all_comments(filename)
-get_comments_by_author(filename, author)
-get_comments_for_paragraph(filename, paragraph_index)
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Missing Styles**
-
-   - Some documents may lack required styles for heading and table operations
-   - The server will attempt to create missing styles or use direct formatting
-   - For best results, use templates with standard Word styles
-
-2. **Permission Issues**
-
-   - Ensure the server has permission to read/write to the document paths
-   - Use the `copy_document` function to create editable copies of locked documents
-   - Check file ownership and permissions if operations fail
-
-3. **Image Insertion Problems**
-   - Use absolute paths for image files
-   - Verify image format compatibility (JPEG, PNG recommended)
-   - Check image file size and permissions
-
-4. **Table Formatting Issues**
-
-   - **Cell index errors**: Ensure row and column indices are within table bounds (0-based indexing)
-   - **Color format problems**: Use hex colors without '#' prefix (e.g., "FF0000" for red) or standard color names
-   - **Padding unit confusion**: Specify "points" or "percent" explicitly when setting cell padding
-   - **Column width conflicts**: Auto-fit may override manual column width settings
-   - **Text formatting persistence**: Apply cell text formatting after setting cell content for best results
-
-### Debugging
-
-Enable detailed logging by setting the environment variable:
+### Lancement Local
 
 ```bash
-export MCP_DEBUG=1  # Linux/macOS
-set MCP_DEBUG=1     # Windows
+python connector_wrapper.py
 ```
 
-## Contributing
+L'API sera disponible sur `http://localhost:8080`
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Test des Endpoints
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+```bash
+# Lister les templates
+curl -H "X-API-Key: <your-key>" http://localhost:8080/api/list/all/templates
 
-## License
+# Créer un document
+curl -X POST http://localhost:8080/api/create/document/from/template \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-key>" \
+  -d '{
+    "template_name": "template-text",
+    "new_document_name": "test_proposal",
+    "variables": {
+      "commercialName": "Test Client",
+      "commercialEmail": "test@client.com",
+      "commercialTel": "0123456789",
+      "propalContent": "Test content"
+    }
+  }'
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📁 Structure du Projet
 
-## Acknowledgments
+```
+.
+├── connector_wrapper.py          # API REST FastAPI
+├── Dockerfile.connector           # Dockerfile pour Container Apps
+├── requirements.txt              # Dépendances Python
+├── deploy-azure-with-storage.sh  # Script de déploiement Azure
+├── word_document_server/
+│   ├── tools/
+│   │   ├── document_tools.py     # Gestion documents
+│   │   ├── content_tools.py      # Ajout contenu (paragraphes, tableaux)
+│   │   ├── format_tools.py       # Formatage tableaux
+│   │   └── template_tools.py     # Gestion templates
+│   └── utils/
+│       ├── azure_storage.py      # Intégration Azure Blob Storage
+│       ├── file_utils.py         # Utilitaires fichiers
+│       └── template_storage.py   # Gestion templates Azure
+└── profiles/
+    ├── GUIDE_ACTIONS_COPILOT.md  # Guide configuration Copilot Studio
+    └── create-propal.swagger.json # Swagger pour import
 
-- [Model Context Protocol](https://modelcontextprotocol.io/) for the protocol specification
-- [python-docx](https://python-docx.readthedocs.io/) for Word document manipulation
-- [FastMCP](https://github.com/modelcontextprotocol/python-sdk) for the Python MCP implementation
+```
 
----
+## 🔐 Sécurité
 
-_Note: This server interacts with document files on your system. Always verify that requested operations are appropriate before confirming them in Claude for Desktop or other MCP clients._
+- **API Key**: Protection des endpoints via header `X-API-Key`
+- **Managed Identity**: Authentification Azure sans clés de stockage
+- **RBAC**: Contrôle d'accès granulaire avec rôles Azure
+- **URLs signées**: Accès temporaire aux documents (24h par défaut)
+
+## 🔧 Dépannage
+
+### ContentFiltered Error (Copilot Studio)
+
+Si vous rencontrez des erreurs "ContentFiltered" dans Copilot Studio:
+
+1. Les réponses sont automatiquement raccourcies à `ok` ou `error: <type>`
+2. Les URLs de documents sont préservées
+3. Activer `DEBUG_MODE=true` pour voir les réponses complètes (développement uniquement)
+
+### Document Not Found
+
+- Vérifier que le managed identity a le rôle "Storage Blob Data Contributor"
+- Vérifier le nom du conteneur dans Azure Storage (`word-documents`)
+- Vérifier les logs du Container App: `az containerapp logs show -n <app-name> -g <rg>`
+
+### Permission Denied
+
+```bash
+# Re-assigner le rôle
+az role assignment create \
+  --assignee <PRINCIPAL_ID> \
+  --role "Storage Blob Data Contributor" \
+  --scope <STORAGE_ID>
+```
+
+## 📝 License
+
+MIT
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues! N'hésitez pas à ouvrir une issue ou une pull request.
+
+## 📞 Support
+
+Pour toute question ou problème:
+- Ouvrir une issue sur GitHub
+- Consulter le guide Copilot Studio dans `profiles/GUIDE_ACTIONS_COPILOT.md`

@@ -117,7 +117,7 @@
       "post": {
         "operationId": "AddDocumentTemplate",
         "summary": "Add Upload Ajouter document template with auto clean nettoyage automatique des tableaux tables",
-        "description": "Add a document as a template to the library with AUTOMATIC table cleaning. Just provide the filename:\n\n✅ AUTO-DETECT: Finds file automatically in word-templates or word-documents\n✅ AUTO-CLEAN: Keeps only title row (row 0) + header row (row 1) in all tables, removes all data rows\n✅ AUTO-CATEGORY: Extracts category from folder path (e.g., 'Eric FER/file.docx' → category 'Eric FER')\n✅ SMART REPLACE: If template_name = source filename → REPLACES file with cleaned version (1 file). If different names → keeps both files (source + template)\n\nReturns: Cleaning statistics and table titles list.",
+        "description": "Add a document as a template to the library with AUTOMATIC table",
         "responses": {
           "200": {
             "description": "Success",
@@ -142,17 +142,17 @@
               "properties": {
                 "source_document": {
                   "type": "string",
-                  "description": "Filename of the document to add (e.g., 'mon-fichier.docx'). System will auto-detect in word-templates or word-documents. For uploaded files in Eric FER folder, just use the filename.",
+                  "description": "Filename of the document to add.",
                   "x-ms-summary": "Source Document"
                 },
                 "template_name": {
                   "type": "string",
-                  "description": "Name for the new template (without .docx extension). Example: 'propal-client-2024'",
+                  "description": "Name for the new template (without .docx extension).",
                   "x-ms-summary": "Template Name"
                 },
                 "category": {
                   "type": "string",
-                  "description": "Template category (optional, auto-detected from folder path). Example: 'Eric FER' is extracted from '/word-templates/Eric FER/file.docx'",
+                  "description": "Template category (optional, auto-detected from folder path).",
                   "x-ms-summary": "Category"
                 },
                 "description": {
@@ -225,7 +225,7 @@
       "post": {
         "operationId": "ReplaceTextUniversal",
         "summary": "Universal text replacement that works everywhere in the document.",
-        "description": "Universal text replacement that works everywhere in the document. Searches and replaces in: paragraphs, tables, headers, and footers.",
+        "description": "Universal text replacement that works everywhere in the document.",
         "responses": {
           "200": {
             "description": "Success",
@@ -883,8 +883,8 @@
   "securityDefinitions": {
     "api_key": {
       "type": "apiKey",
-      "name": "X-API-Key",
-      "in": "header"
+      "in": "header",
+      "name": "X-API-Key"
     }
   },
   "security": [

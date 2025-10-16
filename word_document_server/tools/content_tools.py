@@ -153,14 +153,14 @@ async def add_table(filename: str, rows: int, cols: int, data: Optional[List[Lis
         if not success:
             return f"Document {filename} does not exist: {message}"
         table = doc.add_table(rows=rows, cols=cols)
-        
+
         # Try to set the table style
         try:
             table.style = 'Table Grid'
         except KeyError:
             # If style doesn't exist, add basic borders
             pass
-        
+
         # Fill table with data if provided
         if data:
             for i, row_data in enumerate(data):
@@ -170,7 +170,7 @@ async def add_table(filename: str, rows: int, cols: int, data: Optional[List[Lis
                     if j >= cols:
                         break
                     table.cell(i, j).text = str(cell_text)
-        
+
         # Save document back to blob storage
         success, message = save_document_to_blob(filename, doc)
         if success:
@@ -180,6 +180,60 @@ async def add_table(filename: str, rows: int, cols: int, data: Optional[List[Lis
 
     except Exception as e:
         return f"Failed to add table: {str(e)}"
+
+
+async def add_table_row(filename: str, table_index: int, row_data: List[str]) -> str:
+    """Add a row to an existing table in a Word document.
+
+    Args:
+        filename: Path to the Word document
+        table_index: Index of the table to add row to (0-based)
+        row_data: List of cell values for the new row
+    """
+    filename = ensure_docx_extension(filename)
+
+    try:
+        # Get document from Azure Blob Storage
+        success, doc_data, message = get_document_from_storage(filename)
+        if not success:
+            return f"Document {filename} does not exist: {message}"
+
+        # Load document from blob data
+        doc = Document(io.BytesIO(doc_data))
+
+        # Validate table index
+        if table_index < 0 or table_index >= len(doc.tables):
+            return f"Invalid table index. Document has {len(doc.tables)} tables (0-{len(doc.tables)-1})."
+
+        table = doc.tables[table_index]
+
+        # Add new row
+        new_row = table.add_row()
+
+        # Fill row with data
+        for col_idx, cell_value in enumerate(row_data):
+            if col_idx < len(new_row.cells):
+                new_row.cells[col_idx].text = str(cell_value)
+
+        # Save document back to blob storage
+        doc_buffer = io.BytesIO()
+        doc.save(doc_buffer)
+        doc_data = doc_buffer.getvalue()
+        doc_buffer.close()
+
+        success, save_message = save_document_to_storage(filename, doc_data)
+        if not success:
+            return f"Failed to save document: {save_message}"
+
+        # Get URL if available
+        url = get_document_url(filename)
+        if url:
+            return f"Row added to table {table_index} in {filename}. URL: {url}"
+        else:
+            return f"Row added to table {table_index} in {filename}"
+
+    except Exception as e:
+        return f"Failed to add table row: {str(e)}"
 
 
 async def add_picture(filename: str, image_path: str, width: Optional[float] = None) -> str:

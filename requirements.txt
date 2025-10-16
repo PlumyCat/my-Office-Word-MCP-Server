@@ -1,9 +1,11 @@
-fastmcp>=2.8.1
-python-docx
-msoffcrypto-tool
-docx2pdf
-python-dotenv
-uvicorn
-starlette
-azure-storage-blob
-azure-identity
+# FastAPI and web server
+fastapi>=0.119.0
+uvicorn[standard]>=0.37.0
+python-dotenv>=1.0.0
+
+# Word document manipulation
+python-docx>=1.2.0
+
+# Azure storage
+azure-storage-blob>=12.27.0
+azure-identity>=1.25.0

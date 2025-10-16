@@ -1,52 +1,58 @@
-# Python-generated files
+# Python
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
-*.egg-info
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Virtual environments
-.venv
+# Virtual Environment
+.venv/
 venv/
+ENV/
 env/
 
-# Test files and temporary documents
-test-*.py
-test-*.sh
-test-*.md
-test_*.docx
-*.docx
-debug_*.py
-explore-*.py
+# Environment variables
+.env
+.env.local
 
-# IDE and editor files
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# Environment and secrets
-.env
-.env copy
-.env.local
-*.pem
-*.key
-
 # Logs
 *.log
-logs/
 
-# Backup files
-*.bak
-*~
+# Azure
+.azure/
 
 # Temporary files
+*.tmp
 tmp/
 temp/
-*.tmp
+
+# Test files
+test_*.docx
+propal-*.docx
+proposal_*.docx

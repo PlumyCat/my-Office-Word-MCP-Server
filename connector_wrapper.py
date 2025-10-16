@@ -1,6 +1,8 @@
 """
-FastAPI wrapper to expose ALL Word MCP tools as REST endpoints for Copilot Studio.
-Auto-routes requests to appropriate tool modules.
+Word Document Proposal Generator - REST API Connector
+Creates commercial proposals from templates with variable replacement and table management.
+
+Designed for Microsoft Copilot Studio integration.
 """
 
 import os
@@ -12,25 +14,20 @@ from pydantic import BaseModel, create_model
 from typing import Optional, Dict, Any, get_type_hints
 from dotenv import load_dotenv
 
-# Import ALL MCP tool modules
+# Import MCP tool modules
 from word_document_server.tools import (
     document_tools,
     content_tools,
     format_tools,
-    protection_tools,
-    footnote_tools,
-    extended_document_tools,
-    comment_tools,
     template_tools,
-    advanced_replace_tools
 )
 
 load_dotenv()
 
 app = FastAPI(
-    title="Word Document MCP Connector - Complete",
-    description="REST API wrapper for Word MCP Server - All 75+ tools",
-    version="2.0"
+    title="Word Document Proposal Generator",
+    description="Create commercial proposals from templates - Microsoft Copilot Studio integration",
+    version="1.0"
 )
 
 def shorten_response(response: str) -> str:
@@ -38,6 +35,10 @@ def shorten_response(response: str) -> str:
     Shorten response to minimal format to avoid Copilot Studio content filtering.
     Keeps only: ok/error + URL (if present).
     """
+    # Debug mode: return full response
+    if os.getenv("DEBUG_MODE", "").lower() in ["true", "1", "yes"]:
+        return response
+
     if not response or not isinstance(response, str):
         return str(response)
 
@@ -94,12 +95,7 @@ TOOL_MODULES = {
     "document": document_tools,
     "content": content_tools,
     "format": format_tools,
-    "protection": protection_tools,
-    "footnote": footnote_tools,
-    "extended": extended_document_tools,
-    "comment": comment_tools,
     "template": template_tools,
-    "advanced": advanced_replace_tools,
 }
 
 
@@ -208,9 +204,9 @@ async def root():
     )
 
     return {
-        "name": "Word Document MCP Connector - Complete",
-        "version": "2.0",
-        "description": f"REST API wrapper with {tool_count} tools",
+        "name": "Word Document Proposal Generator",
+        "version": "1.0",
+        "description": f"REST API for proposal generation - {tool_count} tools",
         "swagger": "/openapi.json",
         "tools_available": tool_count
     }
